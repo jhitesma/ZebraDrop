@@ -42,6 +42,7 @@ public class ZebraDrop implements ApplicationListener {
 	long dropRate;
 	int dropSpeed;
 	int dropCount;
+	int numDropped;
 	int level;
 	int ptVal;
 	int points;
@@ -103,12 +104,17 @@ public class ZebraDrop implements ApplicationListener {
 
 	private void newLevel() {
 		gameState = State.Paused;		   
-		level = level + 1;
+		if (neededDrops == ((level -1) *10) /2) {
+		} else {
+			level = level + 1;
+		}
 		dropRate = dropRate / 2 ;
 		dropSpeed = dropSpeed + 50;
 		dropCount = 0;
 		neededDrops = level * 10;
-		ptVal = ptVal + level;
+		ptVal = ptVal + 1;
+		if (ptVal > 8) {ptVal = 8;}
+		numDropped = 0;
 	}
 
 	private void dropLevel() {
@@ -122,24 +128,28 @@ public class ZebraDrop implements ApplicationListener {
 		dropSpeed = dropSpeed - 50;
 		if (dropSpeed < 200) { dropSpeed = 200;}
 
+		ptVal = 1;
 		dropCount = 0;
 		neededDrops = ((level - 1) * 10) / 2 ;
-
+		numDropped = 0;
 	}
 
 
 	private void spawnRaindrop() {
-		Rectangle raindrop = new Rectangle();
-		//	      raindrop.x = MathUtils.random(0, 800-64);
-		//	      raindrop.y = 480;
-		raindrop.x = dropper.x;
-		raindrop.y = dropper.y;	      
-		raindrop.width = 64;
-		raindrop.height = 64;
-		raindrops.add(raindrop);
-		lastDropTime = TimeUtils.nanoTime();
+		if (numDropped < neededDrops) {
+			Rectangle raindrop = new Rectangle();
+			//	      raindrop.x = MathUtils.random(0, 800-64);
+			//	      raindrop.y = 480;
+			raindrop.x = dropper.x;
+			raindrop.y = dropper.y;	      
+			raindrop.width = 64;
+			raindrop.height = 64;
+			raindrops.add(raindrop);
+			lastDropTime = TimeUtils.nanoTime();
+			numDropped++;
+		}
 	}
-
+		
 	@Override
 	public void render() {
 		if (buckets > 0) {
