@@ -246,7 +246,6 @@ public class ZebraDrop implements ApplicationListener {
 					if (dropDir==1) dropDir = 0; else dropDir = 1;
 				}
 
-
 				if (dropDir==1) {
 					dropper.x -= MathUtils.random(200 * level, 250 * level) * Gdx.graphics.getDeltaTime();
 				} else {
