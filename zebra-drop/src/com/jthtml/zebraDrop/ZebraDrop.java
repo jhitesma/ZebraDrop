@@ -57,8 +57,8 @@ public class ZebraDrop implements ApplicationListener {
 	@Override
 	public void create() {
 		
-		maxH = 1080;
-		maxW = 1920;
+		maxW = 1280;
+		maxH = 720;
 		
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
@@ -91,7 +91,8 @@ public class ZebraDrop implements ApplicationListener {
 		dropper.width = 64;
 		dropper.height = 64;
 
-		font = new BitmapFont();
+		font = new BitmapFont(Gdx.files.internal("data/bell_goth_32.fnt"),
+		         Gdx.files.internal("data/bell_goth_32_0.png"), false);
 
 		// create the raindrops array and spawn the first raindrop
 		dropRate = 1000000000;
