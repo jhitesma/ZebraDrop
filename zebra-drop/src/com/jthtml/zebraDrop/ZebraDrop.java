@@ -60,7 +60,6 @@ public class ZebraDrop implements ApplicationListener {
 		
 		maxW = 1280;
 		maxH = 720;
-		lineH = 40;
 		
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
@@ -93,9 +92,14 @@ public class ZebraDrop implements ApplicationListener {
 		dropper.width = 64;
 		dropper.height = 64;
 
-		font = new BitmapFont(Gdx.files.internal("data/bell_goth_32.fnt"),
-		         Gdx.files.internal("data/bell_goth_32_0.png"), false);
+		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
+		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
 
+		// Set Line height
+		lineH = 70;
+
+		
+		
 		// create the raindrops array and spawn the first raindrop
 		dropRate = 1000000000;
 		dropSpeed = 200;
@@ -118,7 +122,9 @@ public class ZebraDrop implements ApplicationListener {
 			level = level + 1;
 		}
 		dropRate = dropRate / 2 ;
+		if (dropRate < 125000000) {dropRate = 125000000;}
 		dropSpeed = dropSpeed + 50;
+		if (dropSpeed > 500) {dropSpeed = 500;}
 		dropCount = 0;
 		neededDrops = level * 10;
 		ptVal = ptVal + 1;
@@ -220,12 +226,12 @@ public class ZebraDrop implements ApplicationListener {
 					batch.draw(dropImage, raindrop.x, raindrop.y);
 				}
 				font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
-				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
-				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
-				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, lineH*4);
-				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
-				font.draw(batch, "Lives: " + Long.toString(buckets), 10, lineH*6);
-				font.draw(batch, "Score: " + Long.toString(points), 10, lineH*7);
+//				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
+//				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
+//				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, lineH*4);
+//				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
+				font.draw(batch, "Lives: " + Long.toString(buckets), 10, lineH*2);
+				font.draw(batch, "Score: " + Long.toString(points), 10, lineH*3);
 
 				batch.end();
 
