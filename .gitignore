@@ -1,5 +1,7 @@
-bin
+bin/
+target/
+*~
 .metadata
-.gwt/*
+.gwt/
 zebra-drop-keystore
 *.apk
