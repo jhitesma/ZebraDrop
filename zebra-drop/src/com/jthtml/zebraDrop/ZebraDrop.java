@@ -50,6 +50,7 @@ public class ZebraDrop implements ApplicationListener {
 	int buckets;
 	int maxW;
 	int maxH;
+	int lineH;
 	BitmapFont font;
 	int dropDir;
 	State gameState;
@@ -59,6 +60,7 @@ public class ZebraDrop implements ApplicationListener {
 		
 		maxW = 1280;
 		maxH = 720;
+		lineH = 40;
 		
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
@@ -189,10 +191,10 @@ public class ZebraDrop implements ApplicationListener {
 				// begin a new batch and draw the bucket and
 				// all drops
 				batch.begin();
-				font.draw(batch, "Level: " + Integer.toString(level), 10, 15);
-				font.draw(batch,  "Lives: " + Long.toString(buckets), 10, 30);		
-				font.draw(batch,  "Score: " + Long.toString(points), 10, 45);		
-				font.draw(batch, "Tap to start", 400, 220);
+				font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
+				font.draw(batch,  "Lives: " + Long.toString(buckets), 10, lineH*2);		
+				font.draw(batch,  "Score: " + Long.toString(points), 10, lineH*3);		
+				font.draw(batch, "Tap to start", maxW/2, maxH/2);
 				batch.end();
 			} else {
 				// clear the screen with a dark blue color. The
@@ -217,13 +219,13 @@ public class ZebraDrop implements ApplicationListener {
 				for(Rectangle raindrop: raindrops) {
 					batch.draw(dropImage, raindrop.x, raindrop.y);
 				}
-				font.draw(batch, "Level: " + Integer.toString(level), 10, 15);
-				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,30);
-				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,45);
-				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, 60);
-				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, 75);
-				font.draw(batch, "Lives: " + Long.toString(buckets), 10, 90);
-				font.draw(batch, "Score: " + Long.toString(points), 10, 105);
+				font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
+				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
+				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
+				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, lineH*4);
+				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
+				font.draw(batch, "Lives: " + Long.toString(buckets), 10, lineH*6);
+				font.draw(batch, "Score: " + Long.toString(points), 10, lineH*7);
 
 				batch.end();
 
@@ -325,10 +327,10 @@ public class ZebraDrop implements ApplicationListener {
 			// begin a new batch and draw the bucket and
 			// all drops
 			batch.begin();
-			font.draw(batch, "Level: " + Integer.toString(level), 10, 15);
-			font.draw(batch,  "Score: " + Long.toString(points), 10, 30);		
-			font.draw(batch, "GAME OVER", 400, 240);
-			font.draw(batch, "Tap to restart", 400, 220);
+			font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
+			font.draw(batch,  "Score: " + Long.toString(points), 10, lineH*2);		
+			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
+			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
 			batch.end();
 		}
 	}
