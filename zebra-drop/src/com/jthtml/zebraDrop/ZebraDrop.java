@@ -48,12 +48,18 @@ public class ZebraDrop implements ApplicationListener {
 	int points;
 	int bonus;
 	int buckets;
+	int maxW;
+	int maxH;
 	BitmapFont font;
 	int dropDir;
 	State gameState;
 
 	@Override
 	public void create() {
+		
+		maxH = 1080;
+		maxW = 1920;
+		
 		// load the images for the droplet and the bucket, 64x64 pixels each
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
@@ -68,20 +74,20 @@ public class ZebraDrop implements ApplicationListener {
 
 		// create the camera and the SpriteBatch
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		camera.setToOrtho(false, maxW, maxH);
 		batch = new SpriteBatch();
 
 		// create a Rectangle to logically represent the bucket
 		bucket = new Rectangle();
-		bucket.x = 800 / 2 - 64 / 2; // center the bucket horizontally
+		bucket.x = maxW / 2 - 64 / 2; // center the bucket horizontally
 		bucket.y = 20; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
 		bucket.width = 64;
 		bucket.height = 64;
 
 		// create the dropper
 		dropper = new Rectangle();
-		dropper.x = 800 / 2 - 64 /2; // start out centered
-		dropper.y = 480 - 74; // 
+		dropper.x = maxW / 2 - 64 /2; // start out centered
+		dropper.y = maxH - 74; // 
 		dropper.width = 64;
 		dropper.height = 64;
 
@@ -232,7 +238,7 @@ public class ZebraDrop implements ApplicationListener {
 
 				// make sure the bucket stays within the screen bounds
 				if(bucket.x < 0) bucket.x = 0;
-				if(bucket.x > 800 - 64) bucket.x = (800 - 64);
+				if(bucket.x > maxW - 64) bucket.x = (maxW - 64);
 
 				// check if we need to create a new raindrop
 				if(TimeUtils.nanoTime() - lastDropTime > dropRate) spawnRaindrop();
@@ -254,7 +260,7 @@ public class ZebraDrop implements ApplicationListener {
 
 				// make sure the dropper stays within the screen bounds
 				if(dropper.x < 0) dropper.x = 0;
-				if(dropper.x > 800 - 64) dropper.x = (800 - 64);
+				if(dropper.x > maxW - 64) dropper.x = (maxW - 64);
 
 				Iterator<Rectangle> iter = raindrops.iterator();
 				while(iter.hasNext()) {
