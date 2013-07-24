@@ -17,6 +17,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.sun.org.apache.xpath.internal.operations.String;
 
 
 public class ZebraDrop implements ApplicationListener {
@@ -30,6 +31,8 @@ public class ZebraDrop implements ApplicationListener {
 	Texture dropImage;
 	Texture bucketImage;
 	Texture dropperImage;
+	Texture backgroundImage;
+	Texture tapitImage;
 	Sound dropSound;
 	Music rainMusic;
 	SpriteBatch batch;
@@ -58,6 +61,8 @@ public class ZebraDrop implements ApplicationListener {
 	@Override
 	public void create() {
 		
+		Texture.setEnforcePotImages(false);
+
 		maxW = 1280;
 		maxH = 720;
 		
@@ -65,7 +70,9 @@ public class ZebraDrop implements ApplicationListener {
 		dropImage = new Texture(Gdx.files.internal("droplet.png"));
 		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
 		dropperImage = new Texture(Gdx.files.internal("bucket.png"));      
-
+		backgroundImage = new Texture(Gdx.files.internal("background.png"));
+		tapitImage = new Texture(Gdx.files.internal("tapit.png"));
+		
 		// load the drop sound effect and the rain background "music"
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
 		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
@@ -73,6 +80,13 @@ public class ZebraDrop implements ApplicationListener {
 		// start the playback of the background music immediately
 		rainMusic.setLooping(true);
 
+		// Load our font
+		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
+		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
+
+		// Set Line height
+		lineH = 70;
+		
 		// create the camera and the SpriteBatch
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, maxW, maxH);
@@ -81,7 +95,7 @@ public class ZebraDrop implements ApplicationListener {
 		// create a Rectangle to logically represent the bucket
 		bucket = new Rectangle();
 		bucket.x = maxW / 2 - 64 / 2; // center the bucket horizontally
-		bucket.y = 20; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
+		bucket.y = 20 + lineH; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
 		bucket.width = 64;
 		bucket.height = 64;
 
@@ -91,14 +105,6 @@ public class ZebraDrop implements ApplicationListener {
 		dropper.y = maxH - 74; // 
 		dropper.width = 64;
 		dropper.height = 64;
-
-		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
-		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
-
-		// Set Line height
-		lineH = 70;
-
-		
 		
 		// create the raindrops array and spawn the first raindrop
 		dropRate = 1000000000;
@@ -186,7 +192,7 @@ public class ZebraDrop implements ApplicationListener {
 					Vector3 touchPos = new Vector3();
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 					camera.unproject(touchPos);
-					if (touchPos.y > 150) {
+					if (touchPos.y > 250) {
 						rainMusic.play();
 						raindrops = new Array<Rectangle>();					   
 						gameState = State.Normal;			
@@ -197,10 +203,12 @@ public class ZebraDrop implements ApplicationListener {
 				// begin a new batch and draw the bucket and
 				// all drops
 				batch.begin();
-				font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
-				font.draw(batch,  "Lives: " + Long.toString(buckets), 10, lineH*2);		
-				font.draw(batch,  "Score: " + Long.toString(points), 10, lineH*3);		
-				font.draw(batch, "Tap to start", maxW/2, maxH/2);
+				batch.draw(backgroundImage, 0, 0);
+				font.draw(batch, Long.toString(points), 20, lineH);
+				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
+//				font.draw(batch, "Tap to start", maxW/2, maxH/2);
+				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
 				batch.end();
 			} else {
 				// clear the screen with a dark blue color. The
@@ -220,18 +228,20 @@ public class ZebraDrop implements ApplicationListener {
 				// begin a new batch and draw the bucket and
 				// all drops
 				batch.begin();
+				batch.draw(backgroundImage, 0, 0);
 				batch.draw(bucketImage, bucket.x, bucket.y);
 				batch.draw(dropperImage, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
 					batch.draw(dropImage, raindrop.x, raindrop.y);
 				}
-				font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
 //				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
 //				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
 //				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, lineH*4);
 //				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
-				font.draw(batch, "Lives: " + Long.toString(buckets), 10, lineH*2);
-				font.draw(batch, "Score: " + Long.toString(points), 10, lineH*3);
+
+				font.draw(batch, Long.toString(points), 20, lineH);
+				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);
 
 				batch.end();
 
@@ -280,7 +290,6 @@ public class ZebraDrop implements ApplicationListener {
 						dropLevel();
 					}
 					if(raindrop.overlaps(bucket)) {
-
 						dropSound.play();
 						iter.remove();
 						dropCount++;
@@ -333,10 +342,12 @@ public class ZebraDrop implements ApplicationListener {
 			// begin a new batch and draw the bucket and
 			// all drops
 			batch.begin();
-			font.draw(batch, "Level: " + Integer.toString(level), 10, lineH);
-			font.draw(batch,  "Score: " + Long.toString(points), 10, lineH*2);		
+			font.draw(batch, Long.toString(points), 20, lineH);
+			font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
 			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
-			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
+//			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
+			batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);
 			batch.end();
 		}
 	}
