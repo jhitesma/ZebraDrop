@@ -259,7 +259,7 @@ public class ZebraDrop implements ApplicationListener {
 //				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
 
 				font.draw(batch, Long.toString(points), 20, lineH);
-				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+//				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);
 
 				batch.end();
@@ -316,9 +316,14 @@ public class ZebraDrop implements ApplicationListener {
 						dropCount++;
 						points = points + ptVal;
 						bonus = bonus + ptVal;
-						if (bonus >= 10000) {
+						if (bonus >= 1000) {
 							if (buckets < 3) {
 								buckets++;
+								bucketBounds.height = bucketBounds.height + 84;
+								if (bucketBounds.height > 212) {
+									bucketBounds.height = 212;
+								}
+								
 							}
 							bonus = 0;
 						}
@@ -347,6 +352,7 @@ public class ZebraDrop implements ApplicationListener {
 				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 				camera.unproject(touchPos);
 				if (touchPos.y > 150) {
+					bucketBounds.height = 212;
 					raindrops = new Array<Rectangle>();					   
 					dropRate = 1000000000;
 					dropSpeed = 200;
