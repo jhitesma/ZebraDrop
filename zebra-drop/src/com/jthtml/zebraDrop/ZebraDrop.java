@@ -39,6 +39,7 @@ public class ZebraDrop implements ApplicationListener {
 	SpriteBatch batch;
 	OrthographicCamera camera;
 	Rectangle bucket;
+	Rectangle bucketBounds;
 	Rectangle dropper;
 	Array<Rectangle> raindrops;
 	long lastDropTime;
@@ -101,6 +102,12 @@ public class ZebraDrop implements ApplicationListener {
 		bucket.width = 64;
 		bucket.height = 64;
 
+		bucketBounds = new Rectangle();
+		bucketBounds.width = 64;
+		bucketBounds.height = 212;
+		bucketBounds.x = bucket.x;
+		bucketBounds.y = bucket.y;
+		
 		// create the dropper
 		dropper = new Rectangle();
 		dropper.x = maxW / 2 - 64 /2; // start out centered
@@ -151,9 +158,11 @@ public class ZebraDrop implements ApplicationListener {
 		dropSpeed = dropSpeed - 50;
 		if (dropSpeed < 200) { dropSpeed = 200;}
 
+		bucketBounds.height = bucketBounds.height - 84;
 		ptVal = 1;
 		dropCount = 0;
 		neededDrops = ((level - 1) * 10) / 2 ;
+		if (neededDrops < 10) { neededDrops = 10;}
 		numDropped = 0;
 	}
 
@@ -207,7 +216,7 @@ public class ZebraDrop implements ApplicationListener {
 				batch.begin();
 				batch.draw(backgroundImage, 0, 0);
 				font.draw(batch, Long.toString(points), 20, lineH);
-				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+//				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
 //				font.draw(batch, "Tap to start", maxW/2, maxH/2);
 				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
@@ -232,6 +241,14 @@ public class ZebraDrop implements ApplicationListener {
 				batch.begin();
 				batch.draw(backgroundImage, 0, 0);
 				batch.draw(bucketImage, bucket.x, bucket.y);
+
+				if (buckets >= 2) {
+					batch.draw(bucketImage, bucket.x, bucket.y + 84);
+				}
+				if (buckets >= 3) {
+					batch.draw(bucketImage, bucket.x, bucket.y + 168);
+				}
+				
 				batch.draw(dropperImage, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
 					batch.draw(dropImage, raindrop.x, raindrop.y);
@@ -261,6 +278,8 @@ public class ZebraDrop implements ApplicationListener {
 				if(bucket.x < 0) bucket.x = 0;
 				if(bucket.x > maxW - 64) bucket.x = (maxW - 64);
 
+				bucketBounds.x = bucket.x;
+				
 				// check if we need to create a new raindrop
 				if(TimeUtils.nanoTime() - lastDropTime > dropRate) spawnRaindrop();
 
@@ -291,7 +310,7 @@ public class ZebraDrop implements ApplicationListener {
 						iter.remove();
 						dropLevel();
 					}
-					if(raindrop.overlaps(bucket)) {
+					if(raindrop.overlaps(bucketBounds)) {
 						dropSound.play();
 						iter.remove();
 						dropCount++;
@@ -345,7 +364,7 @@ public class ZebraDrop implements ApplicationListener {
 			// all drops
 			batch.begin();
 			font.draw(batch, Long.toString(points), 20, lineH);
-			font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+//			font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
 			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
 //			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
 //			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
