@@ -33,6 +33,7 @@ public class ZebraDrop implements ApplicationListener {
 	Texture dropperImage;
 	Texture backgroundImage;
 	Texture tapitImage;
+	Texture gameOverImage;
 	Sound dropSound;
 	Music rainMusic;
 	SpriteBatch batch;
@@ -72,6 +73,7 @@ public class ZebraDrop implements ApplicationListener {
 		dropperImage = new Texture(Gdx.files.internal("bucket.png"));      
 		backgroundImage = new Texture(Gdx.files.internal("background.png"));
 		tapitImage = new Texture(Gdx.files.internal("tapit.png"));
+		gameOverImage = new Texture(Gdx.files.internal("gameover.png"));
 		
 		// load the drop sound effect and the rain background "music"
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -345,9 +347,9 @@ public class ZebraDrop implements ApplicationListener {
 			font.draw(batch, Long.toString(points), 20, lineH);
 			font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
 			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
-			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
+//			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
 //			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
-			batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);
+			batch.draw(gameOverImage, (maxW/2) - 182, (maxH/2) - 97);
 			batch.end();
 		}
 	}
