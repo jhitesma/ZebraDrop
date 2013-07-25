@@ -17,7 +17,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.sun.org.apache.xpath.internal.operations.String;
+import com.badlogic.gdx.Preferences;
 
 
 public class ZebraDrop implements ApplicationListener {
@@ -45,7 +45,11 @@ public class ZebraDrop implements ApplicationListener {
 	long lastDropTime;
 	long neededDrops;
 	long dropRate;
+	long maxDropRate;
+	long minDropRate;
 	int dropSpeed;
+	int maxDropSpeed;
+	int minDropSpeed;
 	int dropCount;
 	int numDropped;
 	int level;
@@ -59,12 +63,21 @@ public class ZebraDrop implements ApplicationListener {
 	BitmapFont font;
 	int dropDir;
 	State gameState;
-
+	Preferences prefs;
+	int highScore;
+	int highLevel;
+	
 	@Override
 	public void create() {
 		
 		Texture.setEnforcePotImages(false);
 
+		// Load high Score and high level
+		prefs = Gdx.app.getPreferences("My Preferences");
+		
+		highScore = prefs.getInteger("highScore");
+		highLevel = prefs.getInteger("highLevel");
+		
 		maxW = 1280;
 		maxH = 720;
 		
@@ -117,7 +130,11 @@ public class ZebraDrop implements ApplicationListener {
 		
 		// create the raindrops array and spawn the first raindrop
 		dropRate = 1000000000;
+		minDropRate = 1000000000;
+		maxDropRate = 62500000;
 		dropSpeed = 200;
+		minDropSpeed = 200;
+		maxDropSpeed = 800;
 		neededDrops = 10;
 		level = 1;
 		dropDir = 1;
@@ -137,9 +154,9 @@ public class ZebraDrop implements ApplicationListener {
 			level = level + 1;
 		}
 		dropRate = dropRate / 2 ;
-		if (dropRate < 125000000) {dropRate = 125000000;}
+		if (dropRate < maxDropRate) {dropRate = maxDropRate;}
 		dropSpeed = dropSpeed + 50;
-		if (dropSpeed > 500) {dropSpeed = 500;}
+		if (dropSpeed > maxDropSpeed) {dropSpeed = maxDropSpeed;}
 		dropCount = 0;
 		neededDrops = level * 10;
 		ptVal = ptVal + 1;
@@ -153,10 +170,10 @@ public class ZebraDrop implements ApplicationListener {
 		if (buckets < 1) { buckets = 0;}
 
 		dropRate = dropRate * 2;
-		if (dropRate > 1000000000) { dropRate = 1000000000;}
+		if (dropRate > minDropRate) { dropRate = minDropRate;}
 
 		dropSpeed = dropSpeed - 50;
-		if (dropSpeed < 200) { dropSpeed = 200;}
+		if (dropSpeed < minDropSpeed) { dropSpeed = minDropSpeed;}
 
 		bucketBounds.height = bucketBounds.height - 84;
 		ptVal = 1;
@@ -216,7 +233,7 @@ public class ZebraDrop implements ApplicationListener {
 				batch.begin();
 				batch.draw(backgroundImage, 0, 0);
 				font.draw(batch, Long.toString(points), 20, lineH);
-//				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
 //				font.draw(batch, "Tap to start", maxW/2, maxH/2);
 				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
@@ -335,6 +352,8 @@ public class ZebraDrop implements ApplicationListener {
 			}
 
 		} else {
+			Boolean newPref = false;
+			
 			// GAME OVER
 			rainMusic.stop();
 			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -347,6 +366,20 @@ public class ZebraDrop implements ApplicationListener {
 			// coordinate system specified by the camera.
 			batch.setProjectionMatrix(camera.combined);
 
+			if (points > highScore) {
+				highScore = points;
+				prefs.putInteger("highScore", highScore);
+				newPref = true;
+			}
+			
+			if (level > highLevel) {
+				highLevel = level;
+				prefs.putInteger("highLevel", highLevel);
+				newPref = true;
+			}
+
+			if (newPref) prefs.flush();
+			
 			if(Gdx.input.isTouched()) {
 				Vector3 touchPos = new Vector3();
 				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -354,8 +387,8 @@ public class ZebraDrop implements ApplicationListener {
 				if (touchPos.y > 150) {
 					bucketBounds.height = 212;
 					raindrops = new Array<Rectangle>();					   
-					dropRate = 1000000000;
-					dropSpeed = 200;
+					dropRate = minDropRate;
+					dropSpeed = minDropSpeed;
 					neededDrops = 10;
 					level = 1;
 					dropDir = 1;
@@ -370,7 +403,7 @@ public class ZebraDrop implements ApplicationListener {
 			// all drops
 			batch.begin();
 			font.draw(batch, Long.toString(points), 20, lineH);
-//			font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
+			font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
 //			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
 //			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
