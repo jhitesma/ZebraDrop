@@ -1,0 +1,68 @@
+
+zdImages.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 1, 714
+  size: 1280, 720
+  orig: 1280, 720
+  offset: 0, 0
+  index: -1
+gameover
+  rotate: false
+  xy: 1, 517
+  size: 365, 195
+  orig: 365, 195
+  offset: 0, 0
+  index: -1
+tapit
+  rotate: false
+  xy: 1283, 1239
+  size: 365, 195
+  orig: 365, 195
+  offset: 0, 0
+  index: -1
+zebra1
+  rotate: false
+  xy: 1, 259
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+zebra2
+  rotate: false
+  xy: 1283, 981
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+zebra3
+  rotate: false
+  xy: 1, 1
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+zebra4
+  rotate: false
+  xy: 1283, 723
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+bucket
+  rotate: false
+  xy: 368, 648
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+droplet
+  rotate: false
+  xy: 1650, 1370
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

@@ -9,8 +9,10 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
@@ -28,12 +30,15 @@ public class ZebraDrop implements ApplicationListener {
 		Reduced
 	}
 
-	Texture dropImage;
-	Texture bucketImage;
-	Texture dropperImage;
-	Texture backgroundImage;
-	Texture tapitImage;
-	Texture gameOverImage;
+	private static final float RUNNING_FRAME_DURATION = 0.06f;
+	
+	TextureRegion dropImage;
+	TextureRegion bucketImage;
+	TextureRegion dropperImage;
+	TextureRegion backgroundImage;
+	TextureRegion tapitImage;
+	TextureRegion gameOverImage;
+	TextureAtlas atlas;
 	Sound dropSound;
 	Music rainMusic;
 	SpriteBatch batch;
@@ -67,10 +72,12 @@ public class ZebraDrop implements ApplicationListener {
 	int highScore;
 	int highLevel;
 	
+	private Animation zebraAnimation;
+	
 	@Override
 	public void create() {
 		
-		Texture.setEnforcePotImages(false);
+//		Texture.setEnforcePotImages(false);
 
 		// Load high Score and high level
 		prefs = Gdx.app.getPreferences("My Preferences");
@@ -82,12 +89,22 @@ public class ZebraDrop implements ApplicationListener {
 		maxH = 720;
 		
 		// load the images for the droplet and the bucket, 64x64 pixels each
-		dropImage = new Texture(Gdx.files.internal("droplet.png"));
-		bucketImage = new Texture(Gdx.files.internal("bucket.png"));
-		dropperImage = new Texture(Gdx.files.internal("bucket.png"));      
-		backgroundImage = new Texture(Gdx.files.internal("background.png"));
-		tapitImage = new Texture(Gdx.files.internal("tapit.png"));
-		gameOverImage = new Texture(Gdx.files.internal("gameover.png"));
+
+		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
+		
+		dropImage = atlas.findRegion("droplet");
+		bucketImage = atlas.findRegion("bucket");
+		dropperImage = atlas.findRegion("bucket");      
+		backgroundImage = atlas.findRegion("background");
+		tapitImage = atlas.findRegion("tapit");
+		gameOverImage = atlas.findRegion("gameover");
+		
+		TextureRegion[] walkLeftFrames = new TextureRegion[3];
+		for (int i = 0 ; i < 3 ; i++) {
+			walkLeftFrames[i] = atlas.findRegion("zebra" + (i+2));
+		}
+		zebraAnimation = new Animation(RUNNING_FRAME_DURATION, walkLeftFrames);
+		
 		
 		// load the drop sound effect and the rain background "music"
 		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
@@ -415,8 +432,7 @@ public class ZebraDrop implements ApplicationListener {
 	@Override
 	public void dispose() {
 		// dispose of all the native resources
-		dropImage.dispose();
-		bucketImage.dispose();
+		atlas.dispose();
 		dropSound.dispose();
 		rainMusic.dispose();
 		batch.dispose();
