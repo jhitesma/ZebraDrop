@@ -30,7 +30,7 @@ public class ZebraDrop implements ApplicationListener {
 		Reduced
 	}
 
-	private static final float RUNNING_FRAME_DURATION = 0.06f;
+	private static final float ZEBRA_FRAME_DURATION = 0.06f;
 	
 	TextureRegion dropImage;
 	TextureRegion bucketImage;
@@ -72,7 +72,10 @@ public class ZebraDrop implements ApplicationListener {
 	int highScore;
 	int highLevel;
 	
+	TextureRegion zebraFrame;
 	private Animation zebraAnimation;
+	float stateTime;
+	
 	
 	@Override
 	public void create() {
@@ -99,11 +102,12 @@ public class ZebraDrop implements ApplicationListener {
 		tapitImage = atlas.findRegion("tapit");
 		gameOverImage = atlas.findRegion("gameover");
 		
-		TextureRegion[] walkLeftFrames = new TextureRegion[3];
-		for (int i = 0 ; i < 3 ; i++) {
-			walkLeftFrames[i] = atlas.findRegion("zebra" + (i+2));
+		stateTime = 0f;  
+		TextureRegion[] zebraFrames = new TextureRegion[5];
+		for (int i = 0 ; i < 5  ; i++) {
+			zebraFrames[i] = atlas.findRegion("zebra" + (i+2));
 		}
-		zebraAnimation = new Animation(RUNNING_FRAME_DURATION, walkLeftFrames);
+		zebraAnimation = new Animation(ZEBRA_FRAME_DURATION, zebraFrames);
 		
 		
 		// load the drop sound effect and the rain background "music"
@@ -220,7 +224,7 @@ public class ZebraDrop implements ApplicationListener {
 	public void render() {
 		if (buckets > 0) {
 			// We still have lives available so run the game loop
-
+			
 			if (gameState == State.Paused) {
 				rainMusic.stop();
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
@@ -250,7 +254,7 @@ public class ZebraDrop implements ApplicationListener {
 				batch.begin();
 				batch.draw(backgroundImage, 0, 0);
 				font.draw(batch, Long.toString(points), 20, lineH);
-				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
+//				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
 //				font.draw(batch, "Tap to start", maxW/2, maxH/2);
 				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
@@ -263,6 +267,9 @@ public class ZebraDrop implements ApplicationListener {
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
+				stateTime += Gdx.graphics.getDeltaTime(); 
+				zebraFrame = zebraAnimation.getKeyFrame(stateTime, true);
+				
 				// tell the camera to update its matrices.
 				camera.update();
 
@@ -285,13 +292,15 @@ public class ZebraDrop implements ApplicationListener {
 				
 				batch.draw(dropperImage, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
-					batch.draw(dropImage, raindrop.x, raindrop.y);
+					batch.draw(zebraFrame, raindrop.x, raindrop.y);
 				}
 //				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
 //				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
 //				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, lineH*4);
 //				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
 
+				font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), maxW/2 - 200, lineH);
+				
 				font.draw(batch, Long.toString(points), 20, lineH);
 //				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);
@@ -372,6 +381,7 @@ public class ZebraDrop implements ApplicationListener {
 			Boolean newPref = false;
 			
 			// GAME OVER
+			stateTime = 0f;  
 			rainMusic.stop();
 			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
