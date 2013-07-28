@@ -31,8 +31,8 @@ public class ZebraDrop implements ApplicationListener {
 	}
 
 	private static final float ZEBRA_FRAME_DURATION = 0.06f;
+	private static final float UFO_FRAME_DURATION = 0.06f;
 	
-	TextureRegion dropImage;
 	TextureRegion bucketImage;
 	TextureRegion dropperImage;
 	TextureRegion backgroundImage;
@@ -46,6 +46,8 @@ public class ZebraDrop implements ApplicationListener {
 	Rectangle bucket;
 	Rectangle bucketBounds;
 	Rectangle dropper;
+	Rectangle tapItBounds;
+	Rectangle touchSpot;
 	Array<Rectangle> raindrops;
 	long lastDropTime;
 	long neededDrops;
@@ -76,6 +78,8 @@ public class ZebraDrop implements ApplicationListener {
 	private Animation zebraAnimation;
 	float stateTime;
 	
+	TextureRegion ufoFrame;
+	private Animation ufoAnimation;
 	
 	@Override
 	public void create() {
@@ -95,7 +99,6 @@ public class ZebraDrop implements ApplicationListener {
 
 		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
 		
-		dropImage = atlas.findRegion("droplet");
 		bucketImage = atlas.findRegion("bucket");
 		dropperImage = atlas.findRegion("bucket");      
 		backgroundImage = atlas.findRegion("background");
@@ -108,6 +111,12 @@ public class ZebraDrop implements ApplicationListener {
 			zebraFrames[i] = atlas.findRegion("zebra" + (i+2));
 		}
 		zebraAnimation = new Animation(ZEBRA_FRAME_DURATION, zebraFrames);
+		
+		TextureRegion[] ufoFrames = new TextureRegion[10];
+		for (int i = 0 ; i < 10  ; i++) {
+			ufoFrames[i] = atlas.findRegion("ufo" + (i+2));
+		}
+		ufoAnimation = new Animation(UFO_FRAME_DURATION, ufoFrames);
 		
 		
 		// load the drop sound effect and the rain background "music"
@@ -142,10 +151,20 @@ public class ZebraDrop implements ApplicationListener {
 		bucketBounds.x = bucket.x;
 		bucketBounds.y = bucket.y;
 		
+		tapItBounds = new Rectangle();
+		tapItBounds.width = 365;
+		tapItBounds.height = 195;
+		tapItBounds.x = (maxW/2) - 182;
+		tapItBounds.y = (maxH/2) - 97;
+		
+		touchSpot = new Rectangle();
+		touchSpot.width = 16;
+		touchSpot.height = 16;
+		
 		// create the dropper
 		dropper = new Rectangle();
 		dropper.x = maxW / 2 - 64 /2; // start out centered
-		dropper.y = maxH - 74; // 
+		dropper.y = maxH - 120; // 
 		dropper.width = 64;
 		dropper.height = 64;
 		
@@ -241,7 +260,9 @@ public class ZebraDrop implements ApplicationListener {
 					Vector3 touchPos = new Vector3();
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 					camera.unproject(touchPos);
-					if (touchPos.y > 250) {
+					touchSpot.x = touchPos.x;
+					touchSpot.y = touchPos.y;
+					if (touchSpot.overlaps(tapItBounds)) {
 						rainMusic.play();
 						raindrops = new Array<Rectangle>();					   
 						gameState = State.Normal;			
@@ -269,6 +290,7 @@ public class ZebraDrop implements ApplicationListener {
 
 				stateTime += Gdx.graphics.getDeltaTime(); 
 				zebraFrame = zebraAnimation.getKeyFrame(stateTime, true);
+				ufoFrame = ufoAnimation.getKeyFrame(stateTime, true);
 				
 				// tell the camera to update its matrices.
 				camera.update();
@@ -290,7 +312,7 @@ public class ZebraDrop implements ApplicationListener {
 					batch.draw(bucketImage, bucket.x, bucket.y + 168);
 				}
 				
-				batch.draw(dropperImage, dropper.x, dropper.y);
+				batch.draw(ufoFrame, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
 					batch.draw(zebraFrame, raindrop.x, raindrop.y);
 				}

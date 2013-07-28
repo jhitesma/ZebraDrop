@@ -5,84 +5,161 @@ filter: MipMapLinearNearest,Nearest
 repeat: none
 background
   rotate: false
-  xy: 1, 330
+  xy: 1, 588
   size: 1280, 720
   orig: 1280, 720
   offset: 0, 0
   index: -1
 gameover
   rotate: false
-  xy: 1, 133
+  xy: 1, 391
   size: 365, 195
   orig: 365, 195
   offset: 0, 0
   index: -1
 tapit
   rotate: false
-  xy: 1283, 855
+  xy: 1283, 1113
   size: 365, 195
   orig: 365, 195
   offset: 0, 0
   index: -1
-bucket
+ufo1
   rotate: false
-  xy: 1, 67
-  size: 64, 64
-  orig: 64, 64
+  xy: 1, 261
+  size: 128, 128
+  orig: 128, 128
   offset: 0, 0
   index: -1
-droplet
+ufo10
   rotate: false
-  xy: 368, 264
+  xy: 368, 458
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo11
+  rotate: false
+  xy: 1283, 983
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo12
+  rotate: false
+  xy: 1650, 1180
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo2
+  rotate: false
+  xy: 1, 131
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo3
+  rotate: false
+  xy: 131, 261
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo4
+  rotate: false
+  xy: 498, 458
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo5
+  rotate: false
+  xy: 1283, 853
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo6
+  rotate: false
+  xy: 1413, 983
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo7
+  rotate: false
+  xy: 1780, 1180
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo8
+  rotate: false
+  xy: 1, 1
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ufo9
+  rotate: false
+  xy: 131, 131
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+bucket
+  rotate: false
+  xy: 368, 392
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra1
   rotate: false
-  xy: 1283, 789
+  xy: 1650, 1114
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra2
   rotate: false
-  xy: 1650, 986
+  xy: 261, 325
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra3
   rotate: false
-  xy: 1, 1
+  xy: 628, 522
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra5
   rotate: false
-  xy: 1, 1
+  xy: 628, 522
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra4
   rotate: false
-  xy: 67, 67
+  xy: 1283, 787
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra6
   rotate: false
-  xy: 368, 198
+  xy: 1413, 917
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra7
   rotate: false
-  xy: 434, 264
+  xy: 1543, 1047
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
