@@ -20,16 +20,19 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.Preferences;
+import com.jthtml.zebraDrop.GoogleInterface;
 
 
 public class ZebraDrop implements ApplicationListener {
-
+	
 	enum State {
 		Paused,
 		Normal,
 		Reduced
 	}
 
+	private GoogleInterface platformInterface;
+	
 	private static final float ZEBRA_FRAME_DURATION = 0.06f;
 	private static final float UFO_FRAME_DURATION = 0.06f;
 	
@@ -80,6 +83,11 @@ public class ZebraDrop implements ApplicationListener {
 	
 	TextureRegion ufoFrame;
 	private Animation ufoAnimation;
+	
+	public ZebraDrop(GoogleInterface aInterface){
+		platformInterface = aInterface;
+		platformInterface.Login();
+	}
 	
 	@Override
 	public void create() {
