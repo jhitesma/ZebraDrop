@@ -2,6 +2,7 @@ package com.jthtml.zebraDrop;
 
 import java.util.Iterator;
 
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -80,7 +81,7 @@ public class ZebraDrop implements ApplicationListener {
 	
 	TextureRegion ufoFrame;
 	private Animation ufoAnimation;
-	
+
 	@Override
 	public void create() {
 		
@@ -112,9 +113,10 @@ public class ZebraDrop implements ApplicationListener {
 		}
 		zebraAnimation = new Animation(ZEBRA_FRAME_DURATION, zebraFrames);
 		
-		TextureRegion[] ufoFrames = new TextureRegion[10];
-		for (int i = 0 ; i < 10  ; i++) {
-			ufoFrames[i] = atlas.findRegion("ufo" + (i+2));
+		TextureRegion[] ufoFrames = new TextureRegion[12];
+		for (int i = 0 ; i < 12  ; i++) {
+			ufoFrames[i] = atlas.findRegion("ufo" + (i+1));
+			Gdx.app.log("texture_load", i + " - ufo" + (i+1));
 		}
 		ufoAnimation = new Animation(UFO_FRAME_DURATION, ufoFrames);
 		
