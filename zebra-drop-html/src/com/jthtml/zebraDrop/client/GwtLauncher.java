@@ -1,6 +1,7 @@
 package com.jthtml.zebraDrop.client;
 
 import com.jthtml.zebraDrop.ZebraDrop;
+import com.jthtml.zebraDrop.DesktopInterface;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
@@ -14,6 +15,6 @@ public class GwtLauncher extends GwtApplication {
 
 	@Override
 	public ApplicationListener getApplicationListener () {
-		return new ZebraDrop();
+		return new ZebraDrop(new DesktopInterface());
 	}
 }
