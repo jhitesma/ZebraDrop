@@ -427,6 +427,8 @@ public class ZebraDrop implements ApplicationListener {
 				highScore = points;
 				prefs.putInteger("highScore", highScore);
 				newPref = true;
+				platformInterface.submitScore(highScore);
+				platformInterface.getScores();
 			}
 			
 			if (level > highLevel) {
