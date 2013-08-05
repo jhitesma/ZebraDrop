@@ -1,6 +1,8 @@
 package com.jthtml.zebraDrop;
 
 import android.content.Intent;
+import android.view.Window;
+import android.view.WindowManager;
 import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -21,6 +23,7 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
     	aHelper = new GameHelper(this);
     	aHelper.enableDebugLog(true, "MYTAG");
    
+    	
     	//create a listener for getting raw data back from leaderboard
     	theLeaderboardListener = new OnLeaderboardScoresLoadedListener() {               
     		public void onLeaderboardScoresLoaded(int arg0, LeaderboardBuffer arg1, LeaderboardScoreBuffer arg2) {
@@ -35,8 +38,17 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+   
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         
         AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
+
+        // Disable hardware functions to save battery power.      
+        cfg.useAccelerometer = false;
+        cfg.useCompass = false;
+        
         cfg.useGL20 = false;
         aHelper.setup(this);
         //initialize(new Game(this), cfg);        
