@@ -7,7 +7,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -20,8 +19,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.Preferences;
 import com.jthtml.zebraDrop.GoogleInterface;
 
@@ -81,8 +78,6 @@ public class ZebraDrop implements ApplicationListener {
 	Preferences prefs;
 	int highScore;
 	int highLevel;
-	
-	ShapeRenderer debugRenderer = new ShapeRenderer();
 	
 	TextureRegion zebraFrame;
 	private Animation zebraAnimation;
@@ -310,14 +305,6 @@ public class ZebraDrop implements ApplicationListener {
 				font.draw(batch, Long.toString(points), 20, lineH);
 				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
-
-				debugRenderer.setProjectionMatrix(camera.combined);
-				debugRenderer.begin(ShapeType.Rectangle);
-				debugRenderer.setColor(new Color(1,0,0,1));
-//				debugRenderer.rect(highScoreBounds.x, highScoreBounds.y, highScoreBounds.width, highScoreBounds.height);
-				debugRenderer.setColor(new Color(0,1,1,0));
-//				debugRenderer.rect(achivementsBounds.x, achivementsBounds.y, achivementsBounds.width, achivementsBounds.height);
-
 				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
 				batch.end();
 			} else {
