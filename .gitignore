@@ -1,3 +1,4 @@
+gen/
 bin/
 target/
 *~
@@ -5,3 +6,5 @@ target/
 .gwt/
 zebra-drop-keystore
 *.apk
+zebra-drop-android/bin
+zebra-drop-android/gen

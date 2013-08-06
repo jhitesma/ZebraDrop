@@ -26,7 +26,8 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
     	
     	//create a listener for getting raw data back from leaderboard
     	theLeaderboardListener = new OnLeaderboardScoresLoadedListener() {               
-    		public void onLeaderboardScoresLoaded(int arg0, LeaderboardBuffer arg1, LeaderboardScoreBuffer arg2) {
+    		@Override
+			public void onLeaderboardScoresLoaded(int arg0, LeaderboardBuffer arg1, LeaderboardScoreBuffer arg2) {
     			System.out.println("In call back");
     			for(int i = 0; i < arg2.getCount(); i++){
     				System.out.println(arg2.get(i).getScoreHolderDisplayName() + " : " + arg2.get(i).getDisplayScore());
@@ -73,18 +74,22 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
     	aHelper.onActivityResult(request, response, data);
     }
  
+	@Override
 	public void onSignInFailed() {
 		System.out.println("sign in failed");
 	}
  
+	@Override
 	public void onSignInSucceeded() {
 		System.out.println("sign in succeeded");
 	}
  
+	@Override
 	public void Login() {
 		try {
 			runOnUiThread(new Runnable(){
 				//@Override
+				@Override
 				public void run(){
 					aHelper.beginUserInitiatedSignIn();
 				}
@@ -93,10 +98,12 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 		catch (final Exception ex){}
 	}
  
+	@Override
 	public void LogOut() {
 		try {
 			runOnUiThread(new Runnable(){
 				//@Override
+				@Override
 				public void run(){
 					aHelper.signOut();
 				}
@@ -105,20 +112,40 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 		catch (final Exception ex){}               
 	}
  
+	@Override
 	public boolean getSignedIn() {
 		return aHelper.isSignedIn();
 	}
  
+	@Override
 	public void submitScore(int _score) {
 		System.out.println("in submit score");
 		aHelper.getGamesClient().submitScore(getString(R.string.leaderboard_score), _score);       
 	}
  
+	@Override
 	public void getScores() {
 		startActivityForResult(aHelper.getGamesClient().getLeaderboardIntent(getString(R.string.leaderboard_score)), 105); 
 	}
  
+	@Override
 	public void getScoresData() {
 		aHelper.getGamesClient().loadPlayerCenteredScores(theLeaderboardListener,getString(R.string.leaderboard_score),1,1,25);
+	}
+
+	@Override
+	public void unlockAchievement(String achievementId) {
+		aHelper.getGamesClient().unlockAchievement(achievementId);
+	}
+
+	@Override
+	public void incrementAchievement(String achievementId, int incBy) {
+		aHelper.getGamesClient().incrementAchievement(achievementId, incBy);
+	}
+
+	@Override
+	public void getAchievements() {
+		// TODO Auto-generated method stub
+		startActivityForResult(aHelper.getGamesClient().getAchievementsIntent(), 13);
 	}
 }

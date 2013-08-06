@@ -16,5 +16,13 @@ public interface GoogleInterface {
        
         //gets the score and gives access to the raw score data
         public void getScoresData();
-              
+        
+        //unlock a simple achievement
+        public void unlockAchievement(String achievementId);
+        
+        //increment an incremental achievement
+        public void incrementAchievement(String achievementId,int incBy);
+        
+        //
+        public void getAchievements();
 }

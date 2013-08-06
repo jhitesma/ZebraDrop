@@ -32,4 +32,19 @@ public class DesktopInterface implements GoogleInterface{
             System.out.println("Desktop: getScoresData()");
     }
 
+	@Override
+	public void unlockAchievement(String achievementId) {
+			System.out.println("Desktop: unlockAchievement(" + achievementId + ")");
+	}
+
+	@Override
+	public void incrementAchievement(String achievementId, int incBy) {
+		System.out.println("Desktop: incrementAchievement(" + achievementId + "," + incBy + ")");		
+	}
+
+	@Override
+	public void getAchievements() {
+		System.out.println("Desktop: getAchievements()");
+	}
+
 }

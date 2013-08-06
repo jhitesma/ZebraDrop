@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -19,6 +20,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.Preferences;
 import com.jthtml.zebraDrop.GoogleInterface;
 
@@ -50,6 +53,8 @@ public class ZebraDrop implements ApplicationListener {
 	Rectangle bucketBounds;
 	Rectangle dropper;
 	Rectangle tapItBounds;
+	Rectangle highScoreBounds;
+	Rectangle achivementsBounds;
 	Rectangle touchSpot;
 	Array<Rectangle> raindrops;
 	long lastDropTime;
@@ -76,6 +81,8 @@ public class ZebraDrop implements ApplicationListener {
 	Preferences prefs;
 	int highScore;
 	int highLevel;
+	
+	ShapeRenderer debugRenderer = new ShapeRenderer();
 	
 	TextureRegion zebraFrame;
 	private Animation zebraAnimation;
@@ -164,6 +171,18 @@ public class ZebraDrop implements ApplicationListener {
 		tapItBounds.height = 195;
 		tapItBounds.x = (maxW/2) - 182;
 		tapItBounds.y = (maxH/2) - 97;
+		
+		highScoreBounds = new Rectangle();
+		highScoreBounds.width = 100;
+		highScoreBounds.height = 100;
+		highScoreBounds.x = tapItBounds.x;
+		highScoreBounds.y = 0;
+		
+		achivementsBounds = new Rectangle();
+		achivementsBounds.width = 100;
+		achivementsBounds.height = 100;
+		achivementsBounds.x = tapItBounds.x;
+		achivementsBounds.y = maxH-100;		
 		
 		touchSpot = new Rectangle();
 		touchSpot.width = 16;
@@ -276,6 +295,12 @@ public class ZebraDrop implements ApplicationListener {
 						gameState = State.Normal;			
 						spawnRaindrop();
 					}
+					if (touchSpot.overlaps(highScoreBounds)) {
+						platformInterface.getScores();
+					}
+					if (touchSpot.overlaps(highScoreBounds)) {
+						platformInterface.getAchievements();
+					}
 				}
 
 				// begin a new batch and draw the bucket and
@@ -283,9 +308,16 @@ public class ZebraDrop implements ApplicationListener {
 				batch.begin();
 				batch.draw(backgroundImage, 0, 0);
 				font.draw(batch, Long.toString(points), 20, lineH);
-//				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
+				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
-//				font.draw(batch, "Tap to start", maxW/2, maxH/2);
+
+				debugRenderer.setProjectionMatrix(camera.combined);
+				debugRenderer.begin(ShapeType.Rectangle);
+				debugRenderer.setColor(new Color(1,0,0,1));
+//				debugRenderer.rect(highScoreBounds.x, highScoreBounds.y, highScoreBounds.width, highScoreBounds.height);
+				debugRenderer.setColor(new Color(0,1,1,0));
+//				debugRenderer.rect(achivementsBounds.x, achivementsBounds.y, achivementsBounds.width, achivementsBounds.height);
+
 				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
 				batch.end();
 			} else {
@@ -391,6 +423,7 @@ public class ZebraDrop implements ApplicationListener {
 						bonus = bonus + ptVal;
 						if (bonus >= 1000) {
 							if (buckets < 3) {
+								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBQ");
 								buckets++;
 								bucketBounds.height = bucketBounds.height + 84;
 								if (bucketBounds.height > 212) {
@@ -437,6 +470,33 @@ public class ZebraDrop implements ApplicationListener {
 				newPref = true;
 			}
 
+			
+			platformInterface.incrementAchievement("CgkIx7_-lMMSEAIQAg",1);
+
+			if (points == 1337) {
+				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAQ");
+			}
+
+			if (points > 3000) {
+				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAw");
+			}
+
+			if (points > 10000) {
+				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBA");
+			}
+			
+			if (points >= 6826) {
+				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+			}
+			
+			if (level >= 15) {
+				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+			}
+
+			if (level == 1) {
+				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBw");
+			}
+			
 			if (newPref) prefs.flush();
 			
 			if(Gdx.input.isTouched()) {
