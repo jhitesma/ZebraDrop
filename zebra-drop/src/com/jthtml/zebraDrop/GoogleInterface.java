@@ -14,6 +14,9 @@ public interface GoogleInterface {
         //gets the scores and displays them threw googles default widget
         public void getScores();
        
+        //gets the scores and displays them threw googles default widget
+        public void getLevels();
+
         //gets the score and gives access to the raw score data
         public void getScoresData();
         

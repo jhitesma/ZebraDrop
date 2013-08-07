@@ -100,6 +100,7 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
  
 	@Override
 	public void LogOut() {
+		System.out.println("Logging Out");
 		try {
 			runOnUiThread(new Runnable(){
 				//@Override
@@ -145,7 +146,11 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 
 	@Override
 	public void getAchievements() {
-		// TODO Auto-generated method stub
 		startActivityForResult(aHelper.getGamesClient().getAchievementsIntent(), 13);
+	}
+
+	@Override
+	public void getLevels() {
+		startActivityForResult(aHelper.getGamesClient().getLeaderboardIntent(getString(R.string.leaderboard_level)), 105); 		
 	}
 }

@@ -53,6 +53,7 @@ public class ZebraDrop implements ApplicationListener {
 	Rectangle dropper;
 	Rectangle tapItBounds;
 	Rectangle highScoreBounds;
+	Rectangle highLevelBounds;
 	Rectangle achivementsBounds;
 	Rectangle loginBounds;
 	Rectangle touchSpot;
@@ -168,27 +169,37 @@ public class ZebraDrop implements ApplicationListener {
 		tapItBounds = new Rectangle();
 		tapItBounds.width = 365;
 		tapItBounds.height = 195;
-		tapItBounds.x = (maxW/2) - 182;
-		tapItBounds.y = (maxH/2) - 97;
+		tapItBounds.x = (maxW/2) - 182 ;
+		tapItBounds.y = (maxH/2) - 97 ;
 		
-		highScoreBounds = new Rectangle();
-		highScoreBounds.width = 64;
-		highScoreBounds.height = 64;
-		highScoreBounds.x = 15;
-		highScoreBounds.y = maxH-300;
+		
 		
 		achivementsBounds = new Rectangle();
-		achivementsBounds.width = 64;
+		achivementsBounds.width = 400;
 		achivementsBounds.height = 64;
-		achivementsBounds.x = 15;
-		achivementsBounds.y = maxH-100;		
+		achivementsBounds.x = 35;
+		achivementsBounds.y = maxH-150;		
+
+		highScoreBounds = new Rectangle();
+		highScoreBounds.width = 400;
+		highScoreBounds.height = 64;
+		highScoreBounds.x = achivementsBounds.x ;
+		highScoreBounds.y = achivementsBounds.y - 75;
+
+		highLevelBounds = new Rectangle();
+		highLevelBounds.width = 400;
+		highLevelBounds.height = 64;
+		highLevelBounds.x = achivementsBounds.x ;
+		highLevelBounds.y = highScoreBounds.y-75;
 		
 		loginBounds = new Rectangle();
-		loginBounds.width = 64;
+		loginBounds.width = 200;
 		loginBounds.height = 64;
-		loginBounds.x = 15;
-		loginBounds.y = maxH-200;		
+		loginBounds.x = achivementsBounds.x ;
+		loginBounds.y = highLevelBounds.y-75;		
 
+		
+		
 
 		touchSpot = new Rectangle();
 		touchSpot.width = 16;
@@ -278,7 +289,11 @@ public class ZebraDrop implements ApplicationListener {
 			// We still have lives available so run the game loop
 			
 			if (gameState == State.Paused) {
-				rainMusic.stop();
+				if (points > 0) {
+					if (rainMusic.isPlaying()) {
+						rainMusic.stop();
+					}
+				}
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -304,14 +319,17 @@ public class ZebraDrop implements ApplicationListener {
 					if (touchSpot.overlaps(highScoreBounds)) {
 						platformInterface.getScores();
 					}
+					if (touchSpot.overlaps(highLevelBounds)) {
+						platformInterface.getLevels();
+					}
 					if (touchSpot.overlaps(achivementsBounds)) {
 						platformInterface.getAchievements();
 					}
 					if (touchSpot.overlaps(loginBounds)) {
 						if (platformInterface.getSignedIn()) {
-							platformInterface.Login();
-						} else {
 							platformInterface.LogOut();
+						} else {
+							platformInterface.Login();
 						}
 					}
 				}
@@ -323,17 +341,22 @@ public class ZebraDrop implements ApplicationListener {
 				font.draw(batch, Long.toString(points), 20, lineH);
 				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
-				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
-				batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
-				batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
-				batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
-				font.draw(batch, "Achievements" + Long.toString(highScore) + " HL: " + Long.toString(highLevel), achivementsBounds.x + 75, achivementsBounds.y);
-				font.draw(batch, "Leaderboards" + Integer.toString(level), highScoreBounds.x + 75, highScoreBounds.y);		
+				batch.draw(tapitImage, tapItBounds.x, tapItBounds.y);				
 
-				if (platformInterface.getSignedIn()) {
-					font.draw(batch, "Logout" + Integer.toString(level), loginBounds.x + 75, loginBounds.y);		
-				} else {
-					font.draw(batch, "Login" + Integer.toString(level), loginBounds.x + 75, loginBounds.y);		
+				if (points == 0) {
+					batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
+					batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
+					batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
+					batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+					font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
+					font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
+					font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
+					font.draw(batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
+					if (platformInterface.getSignedIn()) {
+						font.draw(batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+					} else {
+						font.draw(batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+					}
 				}
 				
 				batch.end();
@@ -534,6 +557,22 @@ public class ZebraDrop implements ApplicationListener {
 					bonus = 0;
 					buckets = 3;	
 				}
+				if (touchSpot.overlaps(highScoreBounds)) {
+					platformInterface.getScores();
+				}
+				if (touchSpot.overlaps(highLevelBounds)) {
+					platformInterface.getLevels();
+				}
+				if (touchSpot.overlaps(achivementsBounds)) {
+					platformInterface.getAchievements();
+				}
+				if (touchSpot.overlaps(loginBounds)) {
+					if (platformInterface.getSignedIn()) {
+						platformInterface.LogOut();
+					} else {
+						platformInterface.Login();
+					}
+				}
 			}
 
 			// begin a new batch and draw the bucket and
@@ -542,8 +581,19 @@ public class ZebraDrop implements ApplicationListener {
 			font.draw(batch, Long.toString(points), 20, lineH);
 			font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
-//			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
-//			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
+			batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
+			batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
+			batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
+			batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+			font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
+			font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
+			font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
+			font.draw(batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
+			if (platformInterface.getSignedIn()) {
+				font.draw(batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+			} else {
+				font.draw(batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+			}			
 			batch.draw(gameOverImage, (maxW/2) - 182, (maxH/2) - 97);
 			batch.end();
 		}

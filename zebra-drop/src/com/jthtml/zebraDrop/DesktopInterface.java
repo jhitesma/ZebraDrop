@@ -47,4 +47,9 @@ public class DesktopInterface implements GoogleInterface{
 		System.out.println("Desktop: getAchievements()");
 	}
 
+	@Override
+	public void getLevels() {
+		System.out.println("Desktop: getLevels()");
+	}
+
 }
