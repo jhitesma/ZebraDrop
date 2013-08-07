@@ -5,161 +5,182 @@ filter: MipMapLinearNearest,Nearest
 repeat: none
 background
   rotate: false
-  xy: 1, 588
+  xy: 1, 654
   size: 1280, 720
   orig: 1280, 720
   offset: 0, 0
   index: -1
 gameover
   rotate: false
-  xy: 1, 391
+  xy: 1, 457
   size: 365, 195
   orig: 365, 195
   offset: 0, 0
   index: -1
 tapit
   rotate: false
-  xy: 1283, 1113
+  xy: 1283, 1179
   size: 365, 195
   orig: 365, 195
   offset: 0, 0
   index: -1
 ufo1
   rotate: false
-  xy: 1, 261
+  xy: 1, 327
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo10
   rotate: false
-  xy: 368, 458
+  xy: 368, 524
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo11
   rotate: false
-  xy: 1283, 983
+  xy: 1283, 1049
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo12
   rotate: false
-  xy: 1650, 1180
+  xy: 1650, 1246
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo2
   rotate: false
-  xy: 1, 131
+  xy: 1, 197
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo3
   rotate: false
-  xy: 131, 261
+  xy: 131, 327
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo4
   rotate: false
-  xy: 498, 458
+  xy: 498, 524
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo5
   rotate: false
-  xy: 1283, 853
+  xy: 1283, 919
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo6
   rotate: false
-  xy: 1413, 983
+  xy: 1413, 1049
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo7
   rotate: false
-  xy: 1780, 1180
+  xy: 1780, 1246
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo8
   rotate: false
-  xy: 1, 1
+  xy: 1, 67
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo9
   rotate: false
-  xy: 131, 131
+  xy: 131, 197
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 bucket
   rotate: false
-  xy: 368, 392
+  xy: 368, 458
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ic_play_games_badge_gray
+  rotate: false
+  xy: 1650, 1180
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ic_play_games_badge_green
+  rotate: false
+  xy: 261, 391
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
+ic_play_games_badge_white
+  rotate: false
+  xy: 628, 588
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra1
   rotate: false
-  xy: 1650, 1114
+  xy: 1283, 853
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra2
   rotate: false
-  xy: 261, 325
+  xy: 1413, 983
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra3
   rotate: false
-  xy: 628, 522
+  xy: 1543, 1113
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra5
   rotate: false
-  xy: 628, 522
+  xy: 1543, 1113
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra4
   rotate: false
-  xy: 1283, 787
+  xy: 1910, 1310
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra6
   rotate: false
-  xy: 1413, 917
+  xy: 1, 1
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 zebra7
   rotate: false
-  xy: 1543, 1047
+  xy: 131, 131
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
