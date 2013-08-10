@@ -40,6 +40,7 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
    
+        aHelper.enableDebugLog(true, "zebraLog");
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -73,7 +74,7 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
     	super.onActivityResult(request, response, data);
     	aHelper.onActivityResult(request, response, data);
     }
- 
+
 	@Override
 	public void onSignInFailed() {
 		System.out.println("sign in failed");
@@ -81,7 +82,7 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
  
 	@Override
 	public void onSignInSucceeded() {
-		System.out.println("sign in succeeded");
+		System.out.println("sign in succeeded");		
 	}
  
 	@Override
@@ -124,6 +125,12 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
 		aHelper.getGamesClient().submitScore(getString(R.string.leaderboard_score), _score);       
 	}
  
+	@Override
+	public void submitLevel(int _level) {
+		System.out.println("in submit level");
+		aHelper.getGamesClient().submitScore(getString(R.string.leaderboard_level), _level);       
+	}
+
 	@Override
 	public void getScores() {
 		startActivityForResult(aHelper.getGamesClient().getLeaderboardIntent(getString(R.string.leaderboard_score)), 105); 

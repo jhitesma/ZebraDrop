@@ -28,4 +28,5 @@ public interface GoogleInterface {
         
         //
         public void getAchievements();
+		public void submitLevel(int level);
 }

@@ -510,13 +510,13 @@ public class ZebraDrop implements ApplicationListener {
 				prefs.putInteger("highScore", highScore);
 				newPref = true;
 				platformInterface.submitScore(highScore);
-				platformInterface.getScores();
 			}
 			
 			if (level > highLevel) {
 				highLevel = level;
 				prefs.putInteger("highLevel", highLevel);
 				newPref = true;
+				platformInterface.submitLevel(highLevel);
 			}
 
 			
@@ -585,6 +585,9 @@ public class ZebraDrop implements ApplicationListener {
 			batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
 			batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
 			batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+//			if (newPref) {
+				font.draw(batch,"^^NEW RECORDS^^", loginBounds.x+40, highLevelBounds.y + highLevelBounds.height +15);
+//			}
 			font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
 			font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
 			font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
@@ -606,6 +609,7 @@ public class ZebraDrop implements ApplicationListener {
 		dropSound.dispose();
 		rainMusic.dispose();
 		batch.dispose();
+		font.dispose();
 	}
 
 	@Override

@@ -52,4 +52,10 @@ public class DesktopInterface implements GoogleInterface{
 		System.out.println("Desktop: getLevels()");
 	}
 
+	@Override
+	public void submitLevel(int level) {
+		System.out.println("Desktop: submitLevel");
+		
+	}
+
 }
