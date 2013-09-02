@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -38,7 +37,6 @@ public class ZebraDrop implements ApplicationListener {
 	private static final float UFO_FRAME_DURATION = 0.06f;
 	
 	TextureRegion bucketImage;
-	TextureRegion dropperImage;
 	TextureRegion backgroundImage;
 	TextureRegion tapitImage;
 	TextureRegion playControllerImage;
@@ -114,16 +112,22 @@ public class ZebraDrop implements ApplicationListener {
 		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
 		
 		bucketImage = atlas.findRegion("bucket");
-		dropperImage = atlas.findRegion("bucket");      
 		backgroundImage = atlas.findRegion("background");
 		tapitImage = atlas.findRegion("tapit");
 		gameOverImage = atlas.findRegion("gameover");
 		playControllerImage = atlas.findRegion("ic_play_games_badge_green");
 		
 		stateTime = 0f;  
-		TextureRegion[] zebraFrames = new TextureRegion[5];
-		for (int i = 0 ; i < 5  ; i++) {
-			zebraFrames[i] = atlas.findRegion("zebra" + (i+2));
+		TextureRegion[] zebraFrames = new TextureRegion[14];
+		for (int i = 0 ; i < 14  ; i++) {
+			if (i < 10) {
+				System.out.println("Loading: " + "hero0" + (i));
+				zebraFrames[i] = atlas.findRegion("hero0" + (i));			
+			}
+			else {
+				System.out.println("Loading: " + "hero" + (i+2));
+				zebraFrames[i] = atlas.findRegion("hero" + (i+2));
+			}
 		}
 		zebraAnimation = new Animation(ZEBRA_FRAME_DURATION, zebraFrames);
 		
@@ -275,8 +279,8 @@ public class ZebraDrop implements ApplicationListener {
 			//	      raindrop.y = 480;
 			raindrop.x = dropper.x;
 			raindrop.y = dropper.y;	      
-			raindrop.width = 64;
-			raindrop.height = 64;
+			raindrop.width = 120;
+			raindrop.height = 100;
 			raindrops.add(raindrop);
 			lastDropTime = TimeUtils.nanoTime();
 			numDropped++;
