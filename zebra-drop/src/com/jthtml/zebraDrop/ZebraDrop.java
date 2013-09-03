@@ -33,8 +33,8 @@ public class ZebraDrop implements ApplicationListener {
 
 	private GoogleInterface platformInterface;
 	
-	private static final float ZEBRA_FRAME_DURATION = 0.06f;
-	private static final float UFO_FRAME_DURATION = 0.06f;
+	private static final float ZEBRA_FRAME_DURATION = 0.04f;
+	private static final float UFO_FRAME_DURATION = 0.08f;
 	
 	TextureRegion bucketImage;
 	TextureRegion backgroundImage;
@@ -118,15 +118,13 @@ public class ZebraDrop implements ApplicationListener {
 		playControllerImage = atlas.findRegion("ic_play_games_badge_green");
 		
 		stateTime = 0f;  
-		TextureRegion[] zebraFrames = new TextureRegion[14];
-		for (int i = 0 ; i < 14  ; i++) {
-			if (i < 10) {
-				System.out.println("Loading: " + "hero0" + (i));
-				zebraFrames[i] = atlas.findRegion("hero0" + (i));			
+		TextureRegion[] zebraFrames = new TextureRegion[16];
+		for (int i = 0 ; i < 16  ; i++) {
+			if (i+1 < 10) {
+				zebraFrames[i] = atlas.findRegion("hero0" + (i+1));	
 			}
 			else {
-				System.out.println("Loading: " + "hero" + (i+2));
-				zebraFrames[i] = atlas.findRegion("hero" + (i+2));
+				zebraFrames[i] = atlas.findRegion("hero" + (i+1));
 			}
 		}
 		zebraAnimation = new Animation(ZEBRA_FRAME_DURATION, zebraFrames);
@@ -219,7 +217,7 @@ public class ZebraDrop implements ApplicationListener {
 		// create the raindrops array and spawn the first raindrop
 		dropRate = 1000000000;
 		minDropRate = 1000000000;
-		maxDropRate = 62500000;
+		maxDropRate = 80000000;
 		dropSpeed = 200;
 		minDropSpeed = 200;
 		maxDropSpeed = 800;
@@ -279,8 +277,8 @@ public class ZebraDrop implements ApplicationListener {
 			//	      raindrop.y = 480;
 			raindrop.x = dropper.x;
 			raindrop.y = dropper.y;	      
-			raindrop.width = 120;
-			raindrop.height = 100;
+			raindrop.width = 52;
+			raindrop.height = 42;
 			raindrops.add(raindrop);
 			lastDropTime = TimeUtils.nanoTime();
 			numDropped++;
@@ -513,33 +511,40 @@ public class ZebraDrop implements ApplicationListener {
 				highScore = points;
 				prefs.putInteger("highScore", highScore);
 				newPref = true;
-				platformInterface.submitScore(highScore);
+				if (platformInterface.getSignedIn()) {
+					platformInterface.submitScore(highScore);
+				}
 			}
+			
 			
 			if (level > highLevel) {
 				highLevel = level;
 				prefs.putInteger("highLevel", highLevel);
 				newPref = true;
-				platformInterface.submitLevel(highLevel);
+				if (platformInterface.getSignedIn()) {
+					platformInterface.submitLevel(highLevel);
+				}
 			}
 
-			
-			platformInterface.incrementAchievement("CgkIx7_-lMMSEAIQAg",1);
+			if (platformInterface.getSignedIn()) {
 
-			if (points == 1337) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAQ");
-			}
-			
-			if (points >= 6826) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
-			}
-			
-			if (level >= 15) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
-			}
-
-			if (level == 1) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBw");
+				platformInterface.incrementAchievement("CgkIx7_-lMMSEAIQAg",1);
+	
+				if (points == 1337) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAQ");
+				}
+				
+				if (points >= 6826) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+				}
+				
+				if (level >= 15) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+				}
+	
+				if (level == 1) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBw");
+				}			
 			}
 			
 			if (newPref) prefs.flush();
@@ -590,7 +595,7 @@ public class ZebraDrop implements ApplicationListener {
 			batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
 			batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
 //			if (newPref) {
-				font.draw(batch,"^^NEW RECORDS^^", loginBounds.x+40, highLevelBounds.y + highLevelBounds.height +15);
+				font.draw(batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
 //			}
 			font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
 			font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
