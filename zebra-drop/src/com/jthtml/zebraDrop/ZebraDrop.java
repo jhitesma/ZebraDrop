@@ -637,6 +637,7 @@ public class ZebraDrop implements ApplicationListener {
 		rainMusic.dispose();
 		batch.dispose();
 		font.dispose();
+		batch.dispose();
 	}
 
 	@Override
