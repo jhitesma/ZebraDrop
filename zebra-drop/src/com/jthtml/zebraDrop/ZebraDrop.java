@@ -252,7 +252,8 @@ public class ZebraDrop implements ApplicationListener {
 		}
 		dropRate = dropRate / 2 ;
 		if (dropRate < maxDropRate) {dropRate = maxDropRate;}
-		dropSpeed = dropSpeed + 50;
+		//dropSpeed = dropSpeed + 50;
+		dropSpeed = minDropSpeed + (level * 50);
 		if (dropSpeed > maxDropSpeed) {dropSpeed = maxDropSpeed;}
 		dropCount = 0;
 		neededDrops = level * 10;
@@ -266,13 +267,16 @@ public class ZebraDrop implements ApplicationListener {
 		buckets = buckets - 1;
 		if (buckets < 1) { buckets = 0;}
 
-		dropRate = minDropRate;
+		//		dropRate = minDropRate;
+		dropRate = dropRate * 2;
 		if (dropRate > minDropRate) { dropRate = minDropRate;}
 
+//		dropSpeed = dropSpeed - 50;
 		dropSpeed = minDropSpeed;
 		if (dropSpeed < minDropSpeed) { dropSpeed = minDropSpeed;}
 
 		bucketBounds.height = bucketBounds.height - 84;
+		//		ptVal = 1;
 		ptVal = ptVal - 1;
 		dropCount = 0;
 		neededDrops = 10;
