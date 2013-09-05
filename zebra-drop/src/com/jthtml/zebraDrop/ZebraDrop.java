@@ -33,7 +33,7 @@ public class ZebraDrop implements ApplicationListener {
 
 	private GoogleInterface platformInterface;
 	
-	private static final float ZEBRA_FRAME_DURATION = 0.04f;
+	private static final float ZEBRA_FRAME_DURATION = 0.02f;
 	private static final float UFO_FRAME_DURATION = 0.08f;
 	
 	TextureRegion bucketImage;
@@ -255,16 +255,16 @@ public class ZebraDrop implements ApplicationListener {
 		buckets = buckets - 1;
 		if (buckets < 1) { buckets = 0;}
 
-		dropRate = dropRate * 2;
+		dropRate = minDropRate;
 		if (dropRate > minDropRate) { dropRate = minDropRate;}
 
-		dropSpeed = dropSpeed - 50;
+		dropSpeed = minDropSpeed;
 		if (dropSpeed < minDropSpeed) { dropSpeed = minDropSpeed;}
 
 		bucketBounds.height = bucketBounds.height - 84;
-		ptVal = 1;
+		ptVal = ptVal - 1;
 		dropCount = 0;
-		neededDrops = ((level - 1) * 10) / 2 ;
+		neededDrops = 10;
 		if (neededDrops < 10) { neededDrops = 10;}
 		numDropped = 0;
 	}
@@ -273,10 +273,8 @@ public class ZebraDrop implements ApplicationListener {
 	private void spawnRaindrop() {
 		if (numDropped < neededDrops) {
 			Rectangle raindrop = new Rectangle();
-			//	      raindrop.x = MathUtils.random(0, 800-64);
-			//	      raindrop.y = 480;
 			raindrop.x = dropper.x;
-			raindrop.y = dropper.y;	      
+			raindrop.y = dropper.y;
 			raindrop.width = 52;
 			raindrop.height = 42;
 			raindrops.add(raindrop);
@@ -396,6 +394,7 @@ public class ZebraDrop implements ApplicationListener {
 				
 				batch.draw(ufoFrame, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
+//					batch.draw(zebraFrame, raindrop.x, raindrop.y, 0, 0, 64, 51, 1, 1, -90);
 					batch.draw(zebraFrame, raindrop.x, raindrop.y);
 				}
 //				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
@@ -594,9 +593,9 @@ public class ZebraDrop implements ApplicationListener {
 			batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
 			batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
 			batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
-//			if (newPref) {
+			if (newPref) {
 				font.draw(batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
-//			}
+			}
 			font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
 			font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
 			font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
