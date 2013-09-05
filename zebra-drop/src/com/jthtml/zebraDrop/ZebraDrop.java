@@ -13,12 +13,13 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.Preferences;
 import com.jthtml.zebraDrop.GoogleInterface;
 
@@ -87,6 +88,16 @@ public class ZebraDrop implements ApplicationListener {
 	
 	TextureRegion ufoFrame;
 	private Animation ufoAnimation;
+	
+	// Rectangle pool used for drops
+	// good to avoid instantiation each frame
+	private Pool<Rectangle> rectPool = new Pool<Rectangle>() {
+		@Override
+		protected Rectangle newObject() {
+			return new Rectangle();
+		}
+	};
+	
 	
 	public ZebraDrop(GoogleInterface aInterface){
 		platformInterface = aInterface;
@@ -272,7 +283,7 @@ public class ZebraDrop implements ApplicationListener {
 
 	private void spawnRaindrop() {
 		if (numDropped < neededDrops) {
-			Rectangle raindrop = new Rectangle();
+			Rectangle raindrop = rectPool.obtain();;
 			raindrop.x = dropper.x;
 			raindrop.y = dropper.y;
 			raindrop.width = 52;
@@ -394,8 +405,8 @@ public class ZebraDrop implements ApplicationListener {
 				
 				batch.draw(ufoFrame, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
-//					batch.draw(zebraFrame, raindrop.x, raindrop.y, 0, 0, 64, 51, 1, 1, -90);
-					batch.draw(zebraFrame, raindrop.x, raindrop.y);
+					batch.draw(zebraFrame, raindrop.x, raindrop.y, 32, 25, 64, 51, 1, 1, -60);
+//					batch.draw(zebraFrame, raindrop.x, raindrop.y);
 				}
 //				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
 //				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
@@ -463,17 +474,21 @@ public class ZebraDrop implements ApplicationListener {
 						points = points + ptVal;
 						bonus = bonus + ptVal;
 
-						if (points >= 3000) {
-							platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAw");
+						if (platformInterface.getSignedIn()) {
+							if (points >= 3000) {
+								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAw");
+							}
+	
+							if (points >= 10000) {
+								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBA");
+							}
 						}
-
-						if (points >= 10000) {
-							platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBA");
-						}
-
+							
 						if (bonus >= 1000) {
 							if (buckets < 3) {
-								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBQ");
+								if (platformInterface.getSignedIn()) {
+									platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBQ");
+								}
 								buckets++;
 								bucketBounds.height = bucketBounds.height + 84;
 								if (bucketBounds.height > 212) {
