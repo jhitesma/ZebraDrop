@@ -1,0 +1,11 @@
+d:
+d:data
+t:data/bell_goth_32.fnt
+i:data/bell_goth_32_0.png
+t:data/bell_goth_64.fnt
+i:data/bell_goth_64_0.png
+i:data/libgdx.png
+a:drop.wav
+a:rain.mp3
+b:zdImages.atlas
+i:zdImages.png

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!--  APP_ID for google play game services -->
+    <string name="app_id">636504481735</string>
+
+    <!-- achievement ID's for GPS -->
+    <string name="achievement_leet">CgkIx7_-lMMSEAIQAQ</string>
+    <string name="achievement_zebra_zoo">CgkIx7_-lMMSEAIQAg</string>
+    <string name="achievement_brigade">CgkIx7_-lMMSEAIQAw</string>
+    <string name="achievement_madbomber">CgkIx7_-lMMSEAIQBA</string>
+    <string name="achievement_extralife">CgkIx7_-lMMSEAIQBQ</string>
+    <string name="achievement_impressive">CgkIx7_-lMMSEAIQBg</string>
+    <string name="achievement_shame">CgkIx7_-lMMSEAIQBw</string>
+
+	<!--  leaderboard ID's for GPS -->
+	<string name="leaderboard_score">CgkIx7_-lMMSEAIQCA</string>
+	<string name="leaderboard_level">CgkIx7_-lMMSEAIQCQ</string>
+</resources>

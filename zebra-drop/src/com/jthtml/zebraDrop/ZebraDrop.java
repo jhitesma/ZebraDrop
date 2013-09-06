@@ -14,30 +14,34 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.Preferences;
+import com.jthtml.zebraDrop.GoogleInterface;
 
 
 public class ZebraDrop implements ApplicationListener {
-
+	
 	enum State {
 		Paused,
 		Normal,
 		Reduced
 	}
 
-	private static final float ZEBRA_FRAME_DURATION = 0.06f;
-	private static final float UFO_FRAME_DURATION = 0.06f;
+	private GoogleInterface platformInterface;
+	
+	private static final float ZEBRA_FRAME_DURATION = 0.02f;
+	private static final float UFO_FRAME_DURATION = 0.08f;
 	
 	TextureRegion bucketImage;
-	TextureRegion dropperImage;
 	TextureRegion backgroundImage;
 	TextureRegion tapitImage;
+	TextureRegion playControllerImage;
 	TextureRegion gameOverImage;
 	TextureAtlas atlas;
 	Sound dropSound;
@@ -48,6 +52,10 @@ public class ZebraDrop implements ApplicationListener {
 	Rectangle bucketBounds;
 	Rectangle dropper;
 	Rectangle tapItBounds;
+	Rectangle highScoreBounds;
+	Rectangle highLevelBounds;
+	Rectangle achivementsBounds;
+	Rectangle loginBounds;
 	Rectangle touchSpot;
 	Array<Rectangle> raindrops;
 	long lastDropTime;
@@ -82,6 +90,22 @@ public class ZebraDrop implements ApplicationListener {
 	TextureRegion ufoFrame;
 	private Animation ufoAnimation;
 
+	
+	// Rectangle pool used for drops
+	// good to avoid instantiation each frame
+	private Pool<Rectangle> rectPool = new Pool<Rectangle>() {
+		@Override
+		protected Rectangle newObject() {
+			return new Rectangle();
+		}
+	};
+	
+	
+	public ZebraDrop(GoogleInterface aInterface){
+		platformInterface = aInterface;
+//		platformInterface.Login();
+	}
+
 	@Override
 	public void create() {
 		
@@ -101,15 +125,20 @@ public class ZebraDrop implements ApplicationListener {
 		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
 		
 		bucketImage = atlas.findRegion("bucket");
-		dropperImage = atlas.findRegion("bucket");      
 		backgroundImage = atlas.findRegion("background");
 		tapitImage = atlas.findRegion("tapit");
 		gameOverImage = atlas.findRegion("gameover");
+		playControllerImage = atlas.findRegion("ic_play_games_badge_green");
 		
 		stateTime = 0f;  
-		TextureRegion[] zebraFrames = new TextureRegion[5];
-		for (int i = 0 ; i < 5  ; i++) {
-			zebraFrames[i] = atlas.findRegion("zebra" + (i+2));
+		TextureRegion[] zebraFrames = new TextureRegion[16];
+		for (int i = 0 ; i < 16  ; i++) {
+			if (i+1 < 10) {
+				zebraFrames[i] = atlas.findRegion("hero0" + (i+1));	
+			}
+			else {
+				zebraFrames[i] = atlas.findRegion("hero" + (i+1));
+			}
 		}
 		zebraAnimation = new Animation(ZEBRA_FRAME_DURATION, zebraFrames);
 		
@@ -156,9 +185,38 @@ public class ZebraDrop implements ApplicationListener {
 		tapItBounds = new Rectangle();
 		tapItBounds.width = 365;
 		tapItBounds.height = 195;
-		tapItBounds.x = (maxW/2) - 182;
-		tapItBounds.y = (maxH/2) - 97;
+		tapItBounds.x = (maxW/2) - 182 ;
+		tapItBounds.y = (maxH/2) - 97 ;
 		
+		
+		
+		achivementsBounds = new Rectangle();
+		achivementsBounds.width = 400;
+		achivementsBounds.height = 64;
+		achivementsBounds.x = 35;
+		achivementsBounds.y = maxH-150;		
+
+		highScoreBounds = new Rectangle();
+		highScoreBounds.width = 400;
+		highScoreBounds.height = 64;
+		highScoreBounds.x = achivementsBounds.x ;
+		highScoreBounds.y = achivementsBounds.y - 75;
+
+		highLevelBounds = new Rectangle();
+		highLevelBounds.width = 400;
+		highLevelBounds.height = 64;
+		highLevelBounds.x = achivementsBounds.x ;
+		highLevelBounds.y = highScoreBounds.y-75;
+		
+		loginBounds = new Rectangle();
+		loginBounds.width = 200;
+		loginBounds.height = 64;
+		loginBounds.x = achivementsBounds.x ;
+		loginBounds.y = highLevelBounds.y-75;		
+
+		
+		
+
 		touchSpot = new Rectangle();
 		touchSpot.width = 16;
 		touchSpot.height = 16;
@@ -173,7 +231,7 @@ public class ZebraDrop implements ApplicationListener {
 		// create the raindrops array and spawn the first raindrop
 		dropRate = 1000000000;
 		minDropRate = 1000000000;
-		maxDropRate = 62500000;
+		maxDropRate = 80000000;
 		dropSpeed = 200;
 		minDropSpeed = 200;
 		maxDropSpeed = 800;
@@ -197,7 +255,8 @@ public class ZebraDrop implements ApplicationListener {
 		}
 		dropRate = dropRate / 2 ;
 		if (dropRate < maxDropRate) {dropRate = maxDropRate;}
-		dropSpeed = dropSpeed + 50;
+		//dropSpeed = dropSpeed + 50;
+		dropSpeed = minDropSpeed + (level * 50);
 		if (dropSpeed > maxDropSpeed) {dropSpeed = maxDropSpeed;}
 		dropCount = 0;
 		neededDrops = level * 10;
@@ -211,16 +270,19 @@ public class ZebraDrop implements ApplicationListener {
 		buckets = buckets - 1;
 		if (buckets < 1) { buckets = 0;}
 
+		//		dropRate = minDropRate;
 		dropRate = dropRate * 2;
 		if (dropRate > minDropRate) { dropRate = minDropRate;}
 
-		dropSpeed = dropSpeed - 50;
+//		dropSpeed = dropSpeed - 50;
+		dropSpeed = minDropSpeed;
 		if (dropSpeed < minDropSpeed) { dropSpeed = minDropSpeed;}
 
 		bucketBounds.height = bucketBounds.height - 84;
-		ptVal = 1;
+		//		ptVal = 1;
+		ptVal = ptVal - 1;
 		dropCount = 0;
-		neededDrops = ((level - 1) * 10) / 2 ;
+		neededDrops = 10;
 		if (neededDrops < 10) { neededDrops = 10;}
 		numDropped = 0;
 	}
@@ -228,13 +290,11 @@ public class ZebraDrop implements ApplicationListener {
 
 	private void spawnRaindrop() {
 		if (numDropped < neededDrops) {
-			Rectangle raindrop = new Rectangle();
-			//	      raindrop.x = MathUtils.random(0, 800-64);
-			//	      raindrop.y = 480;
+			Rectangle raindrop = rectPool.obtain();;
 			raindrop.x = dropper.x;
-			raindrop.y = dropper.y;	      
-			raindrop.width = 64;
-			raindrop.height = 64;
+			raindrop.y = dropper.y;
+			raindrop.width = 52;
+			raindrop.height = 42;
 			raindrops.add(raindrop);
 			lastDropTime = TimeUtils.nanoTime();
 			numDropped++;
@@ -247,7 +307,11 @@ public class ZebraDrop implements ApplicationListener {
 			// We still have lives available so run the game loop
 			
 			if (gameState == State.Paused) {
-				rainMusic.stop();
+				if (points > 0) {
+					if (rainMusic.isPlaying()) {
+						rainMusic.stop();
+					}
+				}
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -270,6 +334,22 @@ public class ZebraDrop implements ApplicationListener {
 						gameState = State.Normal;			
 						spawnRaindrop();
 					}
+					if (touchSpot.overlaps(highScoreBounds)) {
+						platformInterface.getScores();
+					}
+					if (touchSpot.overlaps(highLevelBounds)) {
+						platformInterface.getLevels();
+					}
+					if (touchSpot.overlaps(achivementsBounds)) {
+						platformInterface.getAchievements();
+					}
+					if (touchSpot.overlaps(loginBounds)) {
+						if (platformInterface.getSignedIn()) {
+							platformInterface.LogOut();
+						} else {
+							platformInterface.Login();
+						}
+					}
 				}
 
 				// begin a new batch and draw the bucket and
@@ -277,10 +357,26 @@ public class ZebraDrop implements ApplicationListener {
 				batch.begin();
 				batch.draw(backgroundImage, 0, 0);
 				font.draw(batch, Long.toString(points), 20, lineH);
-//				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
+				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
-//				font.draw(batch, "Tap to start", maxW/2, maxH/2);
-				batch.draw(tapitImage, (maxW/2) - 182, (maxH/2) - 97);				
+				batch.draw(tapitImage, tapItBounds.x, tapItBounds.y);				
+
+				if (points == 0) {
+					batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
+					batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
+					batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
+					batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+					font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
+					font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
+					font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
+					font.draw(batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
+					if (platformInterface.getSignedIn()) {
+						font.draw(batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+					} else {
+						font.draw(batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+					}
+				}
+				
 				batch.end();
 			} else {
 				// clear the screen with a dark blue color. The
@@ -316,7 +412,8 @@ public class ZebraDrop implements ApplicationListener {
 				
 				batch.draw(ufoFrame, dropper.x, dropper.y);
 				for(Rectangle raindrop: raindrops) {
-					batch.draw(zebraFrame, raindrop.x, raindrop.y);
+					batch.draw(zebraFrame, raindrop.x, raindrop.y, 32, 25, 64, 51, 1, 1, -60);
+//					batch.draw(zebraFrame, raindrop.x, raindrop.y);
 				}
 //				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
 //				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
@@ -383,8 +480,22 @@ public class ZebraDrop implements ApplicationListener {
 						dropCount++;
 						points = points + ptVal;
 						bonus = bonus + ptVal;
+
+						if (platformInterface.getSignedIn()) {
+							if (points >= 3000) {
+								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAw");
+							}
+	
+							if (points >= 10000) {
+								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBA");
+							}
+						}
+							
 						if (bonus >= 1000) {
 							if (buckets < 3) {
+								if (platformInterface.getSignedIn()) {
+									platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBQ");
+								}
 								buckets++;
 								bucketBounds.height = bucketBounds.height + 84;
 								if (bucketBounds.height > 212) {
@@ -421,14 +532,42 @@ public class ZebraDrop implements ApplicationListener {
 				highScore = points;
 				prefs.putInteger("highScore", highScore);
 				newPref = true;
+				if (platformInterface.getSignedIn()) {
+					platformInterface.submitScore(highScore);
+				}
 			}
+			
 			
 			if (level > highLevel) {
 				highLevel = level;
 				prefs.putInteger("highLevel", highLevel);
 				newPref = true;
+				if (platformInterface.getSignedIn()) {
+					platformInterface.submitLevel(highLevel);
+				}
 			}
 
+			if (platformInterface.getSignedIn()) {
+
+				platformInterface.incrementAchievement("CgkIx7_-lMMSEAIQAg",1);
+	
+				if (points == 1337) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAQ");
+				}
+				
+				if (points >= 6826) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+				}
+				
+				if (level >= 15) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+				}
+	
+				if (level == 1) {
+					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBw");
+				}			
+			}
+			
 			if (newPref) prefs.flush();
 			
 			if(Gdx.input.isTouched()) {
@@ -448,6 +587,22 @@ public class ZebraDrop implements ApplicationListener {
 					bonus = 0;
 					buckets = 3;	
 				}
+				if (touchSpot.overlaps(highScoreBounds)) {
+					platformInterface.getScores();
+				}
+				if (touchSpot.overlaps(highLevelBounds)) {
+					platformInterface.getLevels();
+				}
+				if (touchSpot.overlaps(achivementsBounds)) {
+					platformInterface.getAchievements();
+				}
+				if (touchSpot.overlaps(loginBounds)) {
+					if (platformInterface.getSignedIn()) {
+						platformInterface.LogOut();
+					} else {
+						platformInterface.Login();
+					}
+				}
 			}
 
 			// begin a new batch and draw the bucket and
@@ -456,8 +611,22 @@ public class ZebraDrop implements ApplicationListener {
 			font.draw(batch, Long.toString(points), 20, lineH);
 			font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
 			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
-//			font.draw(batch, "GAME OVER", maxW/2, (maxH/2) + lineH);
-//			font.draw(batch, "Tap to restart", maxW/2, (maxH/2) - lineH);
+			batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
+			batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
+			batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
+			batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+			if (newPref) {
+				font.draw(batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
+			}
+			font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
+			font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
+			font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
+			font.draw(batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
+			if (platformInterface.getSignedIn()) {
+				font.draw(batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+			} else {
+				font.draw(batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+			}			
 			batch.draw(gameOverImage, (maxW/2) - 182, (maxH/2) - 97);
 			batch.end();
 		}
@@ -469,6 +638,8 @@ public class ZebraDrop implements ApplicationListener {
 		atlas.dispose();
 		dropSound.dispose();
 		rainMusic.dispose();
+		batch.dispose();
+		font.dispose();
 		batch.dispose();
 	}
 
