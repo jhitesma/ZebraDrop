@@ -82,6 +82,8 @@ public class ZebraDrop implements ApplicationListener {
 	Preferences prefs;
 	int highScore;
 	int highLevel;
+
+	Vector3 touchPos;
 	
 	TextureRegion zebraFrame;
 	private Animation zebraAnimation;
@@ -220,6 +222,9 @@ public class ZebraDrop implements ApplicationListener {
 		touchSpot = new Rectangle();
 		touchSpot.width = 16;
 		touchSpot.height = 16;
+
+		touchPos = new Vector3();
+
 		
 		// create the dropper
 		dropper = new Rectangle();
@@ -323,14 +328,13 @@ public class ZebraDrop implements ApplicationListener {
 				batch.setProjectionMatrix(camera.combined);
 
 				if(Gdx.input.isTouched()) {
-					Vector3 touchPos = new Vector3();
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 					camera.unproject(touchPos);
 					touchSpot.x = touchPos.x;
 					touchSpot.y = touchPos.y;
 					if (touchSpot.overlaps(tapItBounds)) {
 						rainMusic.play();
-						raindrops = new Array<Rectangle>();					   
+						raindrops = new Array<Rectangle>();
 						gameState = State.Normal;			
 						spawnRaindrop();
 					}
@@ -430,7 +434,6 @@ public class ZebraDrop implements ApplicationListener {
 
 				// process user input
 				if(Gdx.input.isTouched()) {
-					Vector3 touchPos = new Vector3();
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 					camera.unproject(touchPos);
 					bucket.x = touchPos.x - 64 / 2;
@@ -471,11 +474,13 @@ public class ZebraDrop implements ApplicationListener {
 					Rectangle raindrop = iter.next();
 					raindrop.y -= dropSpeed * Gdx.graphics.getDeltaTime();
 					if(raindrop.y + 64 < 0) {
+						rectPool.free(raindrop);
 						iter.remove();
 						dropLevel();
 					}
 					if(raindrop.overlaps(bucketBounds)) {
 						dropSound.play();
+						rectPool.free(raindrop);
 						iter.remove();
 						dropCount++;
 						points = points + ptVal;
@@ -571,12 +576,10 @@ public class ZebraDrop implements ApplicationListener {
 			if (newPref) prefs.flush();
 			
 			if(Gdx.input.isTouched()) {
-				Vector3 touchPos = new Vector3();
 				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 				camera.unproject(touchPos);
 				if (touchPos.y > 150) {
 					bucketBounds.height = 212;
-					raindrops = new Array<Rectangle>();					   
 					dropRate = minDropRate;
 					dropSpeed = minDropSpeed;
 					neededDrops = 10;
@@ -586,6 +589,7 @@ public class ZebraDrop implements ApplicationListener {
 					points = 0;
 					bonus = 0;
 					buckets = 3;	
+					raindrops = new Array<Rectangle>();
 				}
 				if (touchSpot.overlaps(highScoreBounds)) {
 					platformInterface.getScores();
@@ -640,7 +644,6 @@ public class ZebraDrop implements ApplicationListener {
 		rainMusic.dispose();
 		batch.dispose();
 		font.dispose();
-		batch.dispose();
 	}
 
 	@Override
