@@ -157,8 +157,7 @@ public class GameScreen implements Screen {
 		rainMusic.setLooping(true);
 
 		// Load our font
-		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
-		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
+		font = game.font;
 
 		// Set Line height
 		lineH = 70;
@@ -166,7 +165,7 @@ public class GameScreen implements Screen {
 		// create the camera and the SpriteBatch
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, maxW, maxH);
-		batch = new SpriteBatch();
+		batch = game.batch;
 
 		// create a Rectangle to logically represent the bucket
 		bucket = new Rectangle();

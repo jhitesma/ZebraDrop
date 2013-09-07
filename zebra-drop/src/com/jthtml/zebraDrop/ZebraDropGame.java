@@ -1,6 +1,7 @@
 package com.jthtml.zebraDrop;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.jthtml.zebraDrop.GoogleInterface;
@@ -22,7 +23,10 @@ public class ZebraDropGame extends Game {
 	
 	public void create() {
 		batch = new SpriteBatch();
-		font = new BitmapFont();
+		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
+		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
+
+
 		this.setScreen(new MainMenuScreen(this));
 	}
 	
