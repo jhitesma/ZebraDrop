@@ -5,6 +5,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.os.Bundle;
 
+
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.google.android.gms.games.leaderboard.LeaderboardBuffer;
@@ -54,7 +55,7 @@ public class MainActivity extends AndroidApplication implements GameHelperListen
         cfg.useGL20 = false;
         aHelper.setup(this);
         //initialize(new Game(this), cfg);        
-        initialize(new ZebraDrop(this), cfg);
+        initialize(new ZebraDropGame(this), cfg);
     }
     
     @Override

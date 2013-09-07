@@ -3,11 +3,22 @@ package com.jthtml.zebraDrop;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.jthtml.zebraDrop.GoogleInterface;
 
 public class ZebraDropGame extends Game {
 
+	private GoogleInterface platformInterface;
+	
 	SpriteBatch batch;
 	BitmapFont font;
+	
+	public ZebraDropGame(GoogleInterface aInterface){
+		platformInterface = aInterface;
+	}
+	
+	public GoogleInterface getGameInterface() {
+		return platformInterface;	
+	}
 	
 	public void create() {
 		batch = new SpriteBatch();

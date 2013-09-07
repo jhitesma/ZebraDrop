@@ -12,6 +12,6 @@ public class Main {
 		cfg.width = 1280;
 		cfg.height = 720;
 		
-		new LwjglApplication(new ZebraDrop(new DesktopInterface()), cfg);
+		new LwjglApplication(new ZebraDropGame(new DesktopInterface()), cfg);
 	}
 }

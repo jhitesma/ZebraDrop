@@ -7,12 +7,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.jthtml.zebraDrop.GameScreen;
 
 
-public class MainMenuScreen implements Screen {
+public class PauseScreen implements Screen {
 	final ZebraDropGame game;
 
 	OrthographicCamera camera;
 	
-	public MainMenuScreen(final ZebraDropGame gam) {
+	public PauseScreen(final ZebraDropGame gam) {
 		game = gam;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, 800, 480);
@@ -28,7 +28,7 @@ public class MainMenuScreen implements Screen {
 		game.batch.setProjectionMatrix(camera.combined);
 	
 		game.batch.begin();
-		game.font.draw(game.batch, "Welcome to ZebraDrop", 100, 150);
+		game.font.draw(game.batch, "Catch your breath!", 100, 150);
 		game.font.draw(game.batch, "Tap Anywhere to begin", 100, 100);
 		game.batch.end();
 		
