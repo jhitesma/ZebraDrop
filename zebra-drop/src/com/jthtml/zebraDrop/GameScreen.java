@@ -493,14 +493,14 @@ public class GameScreen implements Screen {
 					Rectangle raindrop = iter.next();
 					raindrop.y -= dropSpeed * Gdx.graphics.getDeltaTime();
 					if(raindrop.y + 64 < 0) {
-						rectPool.free(raindrop);
 						iter.remove();
+						rectPool.free(raindrop);
 						dropLevel();
 					}
 					if(raindrop.overlaps(bucketBounds)) {
 						dropSound.play();
-						rectPool.free(raindrop);
 						iter.remove();
+						rectPool.free(raindrop);
 						dropCount++;
 						points = points + ptVal;
 						bonus = bonus + ptVal;
