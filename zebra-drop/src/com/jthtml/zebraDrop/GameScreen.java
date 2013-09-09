@@ -6,32 +6,21 @@ import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Pool;
-import com.badlogic.gdx.Preferences;
 import com.jthtml.zebraDrop.GoogleInterface;
 
 
 public class GameScreen implements Screen {
-	
-	enum State {
-		Paused,
-		Normal,
-		Reduced
-	}
 
 	private GoogleInterface platformInterface;
 	
@@ -45,9 +34,6 @@ public class GameScreen implements Screen {
 	TextureRegion playControllerImage;
 	TextureRegion gameOverImage;
 	TextureAtlas atlas;
-	Sound dropSound;
-	Music rainMusic;
-	SpriteBatch batch;
 	OrthographicCamera camera;
 	Rectangle bucket;
 	Rectangle bucketBounds;
@@ -58,7 +44,6 @@ public class GameScreen implements Screen {
 	Rectangle achivementsBounds;
 	Rectangle loginBounds;
 	Rectangle touchSpot;
-	Array<Rectangle> raindrops;
 	long lastDropTime;
 	long neededDrops;
 	long dropRate;
@@ -69,20 +54,10 @@ public class GameScreen implements Screen {
 	int minDropSpeed;
 	int dropCount;
 	int numDropped;
-	int level;
 	int ptVal;
-	int points;
 	int bonus;
 	int buckets;
-	int maxW;
-	int maxH;
-	int lineH;
-	BitmapFont font;
 	int dropDir;
-	State gameState;
-	Preferences prefs;
-	int highScore;
-	int highLevel;
 
 	Vector3 touchPos;
 	
@@ -107,22 +82,9 @@ public class GameScreen implements Screen {
 	public GameScreen(ZebraDropGame gam){
 		game = gam;
 		platformInterface = game.getGameInterface();
-//		platformInterface.Login();
-//		Texture.setEnforcePotImages(false);
 
-		// Load high Score and high level
-		prefs = Gdx.app.getPreferences("My Preferences");
-		
-		highScore = prefs.getInteger("highScore");
-		highLevel = prefs.getInteger("highLevel");
-		
-		maxW = 1280;
-		maxH = 720;
-		
 		// load the images for the droplet and the bucket, 64x64 pixels each
-
-		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
-		
+		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));		
 		bucketImage = atlas.findRegion("bucket");
 		backgroundImage = atlas.findRegion("background");
 		tapitImage = atlas.findRegion("tapit");
@@ -149,28 +111,14 @@ public class GameScreen implements Screen {
 		ufoAnimation = new Animation(UFO_FRAME_DURATION, ufoFrames);
 		
 		
-		// load the drop sound effect and the rain background "music"
-		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-
-		// start the playback of the background music immediately
-		rainMusic.setLooping(true);
-
-		// Load our font
-		font = game.font;
-
-		// Set Line height
-		lineH = 70;
-		
 		// create the camera and the SpriteBatch
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, maxW, maxH);
-		batch = game.batch;
+		camera.setToOrtho(false, game.maxW, game.maxH);
 
 		// create a Rectangle to logically represent the bucket
 		bucket = new Rectangle();
-		bucket.x = maxW / 2 - 64 / 2; // center the bucket horizontally
-		bucket.y = 20 + lineH; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
+		bucket.x = game.maxW / 2 - 64 / 2; // center the bucket horizontally
+		bucket.y = 20 + game.lineH; // bottom left corner of the bucket is 20 pixels above the bottom screen edge
 		bucket.width = 64;
 		bucket.height = 64;
 
@@ -183,8 +131,8 @@ public class GameScreen implements Screen {
 		tapItBounds = new Rectangle();
 		tapItBounds.width = 365;
 		tapItBounds.height = 195;
-		tapItBounds.x = (maxW/2) - 182 ;
-		tapItBounds.y = (maxH/2) - 97 ;
+		tapItBounds.x = (game.maxW/2) - 182 ;
+		tapItBounds.y = (game.maxH/2) - 97 ;
 		
 		
 		
@@ -192,7 +140,7 @@ public class GameScreen implements Screen {
 		achivementsBounds.width = 400;
 		achivementsBounds.height = 64;
 		achivementsBounds.x = 35;
-		achivementsBounds.y = maxH-150;		
+		achivementsBounds.y = game.maxH-150;		
 
 		highScoreBounds = new Rectangle();
 		highScoreBounds.width = 400;
@@ -224,8 +172,8 @@ public class GameScreen implements Screen {
 		
 		// create the dropper
 		dropper = new Rectangle();
-		dropper.x = maxW / 2 - 64 /2; // start out centered
-		dropper.y = maxH - 120; // 
+		dropper.x = game.maxW / 2 - 64 /2; // start out centered
+		dropper.y = game.maxH - 120; // 
 		dropper.width = 64;
 		dropper.height = 64;
 		
@@ -237,37 +185,37 @@ public class GameScreen implements Screen {
 		minDropSpeed = 200;
 		maxDropSpeed = 800;
 		neededDrops = 10;
-		level = 1;
+		game.level = 1;
 		dropDir = 1;
 		ptVal = 1;
-		points = 0;
+		game.points = 0;
 		bonus = 0;
 		buckets = 3;
-		raindrops = new Array<Rectangle>();
-		gameState = State.Paused;
+		game.raindrops = new Array<Rectangle>();
+		game.gameState = game.gameState.Paused;
 		//	      spawnRaindrop();
 	}
 
 	private void newLevel() {
-		gameState = State.Paused;		   
-		if (neededDrops == ((level -1) *10) /2) {
+		game.gameState = game.gameState.Paused;		   
+		if (neededDrops == ((game.level -1) *10) /2) {
 		} else {
-			level = level + 1;
+			game.level = game.level + 1;
 		}
 		dropRate = dropRate / 2 ;
 		if (dropRate < maxDropRate) {dropRate = maxDropRate;}
 		//dropSpeed = dropSpeed + 50;
-		dropSpeed = minDropSpeed + (level * 50);
+		dropSpeed = minDropSpeed + (game.level * 50);
 		if (dropSpeed > maxDropSpeed) {dropSpeed = maxDropSpeed;}
 		dropCount = 0;
-		neededDrops = level * 10;
+		neededDrops = game.level * 10;
 		ptVal = ptVal + 1;
 		if (ptVal > 8) {ptVal = 8;}
 		numDropped = 0;
 	}
 
 	private void dropLevel() {
-		gameState = State.Paused;
+		game.gameState = game.gameState.Paused;
 		buckets = buckets - 1;
 		if (buckets < 1) { buckets = 0;}
 
@@ -296,7 +244,7 @@ public class GameScreen implements Screen {
 			raindrop.y = dropper.y;
 			raindrop.width = 52;
 			raindrop.height = 42;
-			raindrops.add(raindrop);
+			game.raindrops.add(raindrop);
 			lastDropTime = TimeUtils.nanoTime();
 			numDropped++;
 		}
@@ -306,10 +254,6 @@ public class GameScreen implements Screen {
 	public void dispose() {
 		// dispose of all the native resources
 		atlas.dispose();
-		dropSound.dispose();
-		rainMusic.dispose();
-		batch.dispose();
-		font.dispose();
 	}
 	
 	@Override
@@ -330,12 +274,9 @@ public class GameScreen implements Screen {
 		if (buckets > 0) {
 			// We still have lives available so run the game loop
 			
-			if (gameState == State.Paused) {
-				if (points > 0) {
-					if (rainMusic.isPlaying()) {
-						rainMusic.stop();
-					}
-				}
+			if (game.gameState == game.gameState.Paused) {
+//				game.setScreen(new PauseScreen(game));
+
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -344,7 +285,7 @@ public class GameScreen implements Screen {
 
 				// tell the SpriteBatch to render in the
 				// coordinate system specified by the camera.
-				batch.setProjectionMatrix(camera.combined);
+				game.batch.setProjectionMatrix(camera.combined);
 
 				if(Gdx.input.isTouched()) {
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -352,9 +293,8 @@ public class GameScreen implements Screen {
 					touchSpot.x = touchPos.x;
 					touchSpot.y = touchPos.y;
 					if (touchSpot.overlaps(tapItBounds)) {
-						rainMusic.play();
-						raindrops = new Array<Rectangle>();
-						gameState = State.Normal;			
+						game.raindrops = new Array<Rectangle>();
+						game.gameState = game.gameState.Normal;			
 						spawnRaindrop();
 					}
 					if (touchSpot.overlaps(highScoreBounds)) {
@@ -377,30 +317,18 @@ public class GameScreen implements Screen {
 
 				// begin a new batch and draw the bucket and
 				// all drops
-				batch.begin();
-				batch.draw(backgroundImage, 0, 0);
-				font.draw(batch, Long.toString(points), 20, lineH);
-				font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
-				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);		
-				batch.draw(tapitImage, tapItBounds.x, tapItBounds.y);				
+				game.batch.begin();
+				game.batch.draw(backgroundImage, 0, 0);
+				game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
+				game.font.draw(game.batch, "HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel), game.maxW/2 - 160, game.lineH);
+				game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);		
+				game.batch.draw(tapitImage, tapItBounds.x, tapItBounds.y);				
 
-				if (points == 0) {
-					batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
-					batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
-					batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
-					batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
-					font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
-					font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
-					font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
-					font.draw(batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
-					if (platformInterface.getSignedIn()) {
-						font.draw(batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
-					} else {
-						font.draw(batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
-					}
+				if (game.points == 0) {
+					System.out.println("I don't think I should be here!");
 				}
 				
-				batch.end();
+				game.batch.end();
 			} else {
 				// clear the screen with a dark blue color. The
 				// arguments to glClearColor are the red, green
@@ -418,38 +346,37 @@ public class GameScreen implements Screen {
 
 				// tell the SpriteBatch to render in the
 				// coordinate system specified by the camera.
-				batch.setProjectionMatrix(camera.combined);
+				game.batch.setProjectionMatrix(camera.combined);
 
 				// begin a new batch and draw the bucket and
 				// all drops
-				batch.begin();
-				batch.draw(backgroundImage, 0, 0);
-				batch.draw(bucketImage, bucket.x, bucket.y);
+				game.batch.begin();
+				game.batch.draw(backgroundImage, 0, 0);
+				game.batch.draw(bucketImage, bucket.x, bucket.y);
 
 				if (buckets >= 2) {
-					batch.draw(bucketImage, bucket.x, bucket.y + 84);
+					game.batch.draw(bucketImage, bucket.x, bucket.y + 84);
 				}
 				if (buckets >= 3) {
-					batch.draw(bucketImage, bucket.x, bucket.y + 168);
+					game.batch.draw(bucketImage, bucket.x, bucket.y + 168);
 				}
 				
-				batch.draw(ufoFrame, dropper.x, dropper.y);
-				for(Rectangle raindrop: raindrops) {
-					batch.draw(zebraFrame, raindrop.x, raindrop.y, 32, 25, 64, 51, 1, 1, -60);
-//					batch.draw(zebraFrame, raindrop.x, raindrop.y);
+				game.batch.draw(ufoFrame, dropper.x, dropper.y);
+				for(Rectangle raindrop: game.raindrops) {
+					game.batch.draw(zebraFrame, raindrop.x, raindrop.y, 32, 25, 64, 51, 1, 1, -60);
+//					game.batch.draw(zebraFrame, raindrop.x, raindrop.y);
 				}
-//				font.draw(batch, "dropCount: " + Integer.toString(dropCount),10,lineH*2);
-//				font.draw(batch, "neededDrops: " + Long.toString(neededDrops),10,lineH*3);
-//				font.draw(batch, "dropRate: " + Long.toString(dropRate), 10, lineH*4);
-//				font.draw(batch, "dropSpeed: " + Long.toString(dropSpeed), 10, lineH*5);
+//				font.draw(game.batch, "dropCount: " + Integer.toString(dropCount),10,game.lineH*2);
+//				font.draw(game.batch, "neededDrops: " + Long.toString(neededDrops),10,game.lineH*3);
+//				font.draw(game.batch, "dropRate: " + Long.toString(dropRate), 10, game.lineH*4);
+//				font.draw(game.batch, "dropSpeed: " + Long.toString(dropSpeed), 10, game.lineH*5);
 
-				font.draw(batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), maxW/2 - 200, lineH);
+				game.font.draw(game.batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), game.maxW/2 - 200, game.lineH);
 				
-				font.draw(batch, Long.toString(points), 20, lineH);
-//				font.draw(batch, "Lives: " + Long.toString(buckets), maxW/2, lineH);
-				font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);
+				game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
+				game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);
 
-				batch.end();
+				game.batch.end();
 
 				// process user input
 				if(Gdx.input.isTouched()) {
@@ -462,7 +389,7 @@ public class GameScreen implements Screen {
 
 				// make sure the bucket stays within the screen bounds
 				if(bucket.x < 0) bucket.x = 0;
-				if(bucket.x > maxW - 64) bucket.x = (maxW - 64);
+				if(bucket.x > game.maxW - 64) bucket.x = (game.maxW - 64);
 
 				bucketBounds.x = bucket.x;
 				
@@ -479,16 +406,16 @@ public class GameScreen implements Screen {
 				}
 
 				if (dropDir==1) {
-					dropper.x -= MathUtils.random(200 * level, 250 * level) * Gdx.graphics.getDeltaTime();
+					dropper.x -= MathUtils.random(200 * game.level, 250 * game.level) * Gdx.graphics.getDeltaTime();
 				} else {
-					dropper.x += MathUtils.random(200 * level, 250 * level) * Gdx.graphics.getDeltaTime();	      
+					dropper.x += MathUtils.random(200 * game.level, 250 * game.level) * Gdx.graphics.getDeltaTime();	      
 				}
 
 				// make sure the dropper stays within the screen bounds
 				if(dropper.x < 0) dropper.x = 0;
-				if(dropper.x > maxW - 64) dropper.x = (maxW - 64);
+				if(dropper.x > game.maxW - 64) dropper.x = (game.maxW - 64);
 
-				Iterator<Rectangle> iter = raindrops.iterator();
+				Iterator<Rectangle> iter = game.raindrops.iterator();
 				while(iter.hasNext()) {
 					Rectangle raindrop = iter.next();
 					raindrop.y -= dropSpeed * Gdx.graphics.getDeltaTime();
@@ -498,19 +425,19 @@ public class GameScreen implements Screen {
 						dropLevel();
 					}
 					if(raindrop.overlaps(bucketBounds)) {
-						dropSound.play();
+						game.dropSound.play();
 						iter.remove();
 						rectPool.free(raindrop);
 						dropCount++;
-						points = points + ptVal;
+						game.points = game.points + ptVal;
 						bonus = bonus + ptVal;
 
 						if (platformInterface.getSignedIn()) {
-							if (points >= 3000) {
+							if (game.points >= 3000) {
 								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAw");
 							}
 	
-							if (points >= 10000) {
+							if (game.points >= 10000) {
 								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBA");
 							}
 						}
@@ -541,7 +468,7 @@ public class GameScreen implements Screen {
 			
 			// GAME OVER
 			stateTime = 0f;  
-			rainMusic.stop();
+			game.rainMusic.stop();
 			Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 			Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
@@ -550,24 +477,24 @@ public class GameScreen implements Screen {
 
 			// tell the SpriteBatch to render in the
 			// coordinate system specified by the camera.
-			batch.setProjectionMatrix(camera.combined);
+			game.batch.setProjectionMatrix(camera.combined);
 
-			if (points > highScore) {
-				highScore = points;
-				prefs.putInteger("highScore", highScore);
+			if (game.points > game.highScore) {
+				game.highScore = game.points;
+				game.prefs.putInteger("highScore", game.highScore);
 				newPref = true;
 				if (platformInterface.getSignedIn()) {
-					platformInterface.submitScore(highScore);
+					platformInterface.submitScore(game.highScore);
 				}
 			}
 			
 			
-			if (level > highLevel) {
-				highLevel = level;
-				prefs.putInteger("highLevel", highLevel);
+			if (game.level > game.highLevel) {
+				game.highLevel = game.level;
+				game.prefs.putInteger("highLevel", game.highLevel);
 				newPref = true;
 				if (platformInterface.getSignedIn()) {
-					platformInterface.submitLevel(highLevel);
+					platformInterface.submitLevel(game.highLevel);
 				}
 			}
 
@@ -575,24 +502,24 @@ public class GameScreen implements Screen {
 
 				platformInterface.incrementAchievement("CgkIx7_-lMMSEAIQAg",1);
 	
-				if (points == 1337) {
+				if (game.points == 1337) {
 					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAQ");
 				}
 				
-				if (points >= 6826) {
+				if (game.points >= 6826) {
 					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
 				}
 				
-				if (level >= 15) {
+				if (game.level >= 15) {
 					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
 				}
 	
-				if (level == 1) {
+				if (game.level == 1) {
 					platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBw");
 				}			
 			}
 			
-			if (newPref) prefs.flush();
+			if (newPref) game.prefs.flush();
 			
 			if(Gdx.input.isTouched()) {
 				touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -602,13 +529,13 @@ public class GameScreen implements Screen {
 					dropRate = minDropRate;
 					dropSpeed = minDropSpeed;
 					neededDrops = 10;
-					level = 1;
+					game.level = 1;
 					dropDir = 1;
 					ptVal = 1;
-					points = 0;
+					game.points = 0;
 					bonus = 0;
 					buckets = 3;	
-					raindrops = new Array<Rectangle>();
+					game.raindrops = new Array<Rectangle>();
 				}
 				if (touchSpot.overlaps(highScoreBounds)) {
 					platformInterface.getScores();
@@ -630,40 +557,38 @@ public class GameScreen implements Screen {
 
 			// begin a new batch and draw the bucket and
 			// all drops
-			batch.begin();
-			font.draw(batch, Long.toString(points), 20, lineH);
-			font.draw(batch, "HS: " + Long.toString(highScore) + " HL: " + Long.toString(highLevel), maxW/2 - 160, lineH);
-			font.draw(batch, "Level: " + Integer.toString(level), maxW-(8*30), lineH);	
-			batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
-			batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
-			batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
-			batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+			game.batch.begin();
+			game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
+			game.font.draw(game.batch, "HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel), game.maxW/2 - 160, game.lineH);
+			game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);	
+			game.batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
+			game.batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
+			game.batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
+			game.batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
 			if (newPref) {
-				font.draw(batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
+				game.font.draw(game.batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
 			}
-			font.draw(batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, maxH-100);
-			font.draw(batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
-			font.draw(batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
-			font.draw(batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
+			game.font.draw(game.batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, game.maxH-100);
+			game.font.draw(game.batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
+			game.font.draw(game.batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
+			game.font.draw(game.batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
 			if (platformInterface.getSignedIn()) {
-				font.draw(batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+				game.font.draw(game.batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
 			} else {
-				font.draw(batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+				game.font.draw(game.batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
 			}			
-			batch.draw(gameOverImage, (maxW/2) - 182, (maxH/2) - 97);
-			batch.end();
+			game.batch.draw(gameOverImage, (game.maxW/2) - 182, (game.maxH/2) - 97);
+			game.batch.end();
 		}	
 	}
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-		
+		game.rainMusic.play();
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-		
+		game.rainMusic.stop();
 	}
 }
