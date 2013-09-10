@@ -12,10 +12,12 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Pool;
 import com.jthtml.zebraDrop.GoogleInterface;
+import com.jthtml.zebraDrop.Zebra;
 
 
 public class GameScreen implements Screen {
@@ -43,10 +45,10 @@ public class GameScreen implements Screen {
 
 	// Rectangle pool used for drops
 	// good to avoid instantiation each frame
-	private Pool<Rectangle> rectPool = new Pool<Rectangle>() {
+	private Pool<Zebra> zebraPool = new Pool<Zebra>() {
 		@Override
-		protected Rectangle newObject() {
-			return new Rectangle();
+		protected Zebra newObject() {
+			return new Zebra();
 		}
 	};
 	
@@ -143,12 +145,13 @@ public class GameScreen implements Screen {
 
 	private void spawnRaindrop() {
 		if (game.numDropped < game.neededDrops) {
-			Rectangle raindrop = rectPool.obtain();;
-			raindrop.x = dropper.x;
-			raindrop.y = dropper.y;
-			raindrop.width = 52;
-			raindrop.height = 42;
-			game.raindrops.add(raindrop);
+			Zebra zebra = zebraPool.obtain();;
+			zebra.position.x = dropper.x;
+			zebra.position.y = dropper.y;
+			zebra.bounds.width = 52;
+			zebra.bounds.height = 42;
+			zebra.stateTime = game.stateTime;
+			game.zebras.add(zebra);
 			lastDropTime = TimeUtils.nanoTime();
 			game.numDropped++;
 		}
@@ -187,8 +190,6 @@ public class GameScreen implements Screen {
 				Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 
-				game.stateTime += Gdx.graphics.getDeltaTime(); 
-				zebraFrame = zebraAnimation.getKeyFrame(game.stateTime, true);
 				ufoFrame = ufoAnimation.getKeyFrame(game.stateTime, true);
 				
 				// tell the camera to update its matrices.
@@ -212,9 +213,10 @@ public class GameScreen implements Screen {
 				}
 				
 				game.batch.draw(ufoFrame, dropper.x, dropper.y);
-				for(Rectangle raindrop: game.raindrops) {
-					game.batch.draw(zebraFrame, raindrop.x, raindrop.y, 32, 25, 64, 51, 1, 1, -60);
-//					game.batch.draw(zebraFrame, raindrop.x, raindrop.y);
+				for(Zebra zebra: game.zebras) {
+					zebra.update(Gdx.graphics.getDeltaTime());
+					zebraFrame = zebraAnimation.getKeyFrame(zebra.stateTime, true);					
+					game.batch.draw(zebraFrame, zebra.position.x, zebra.position.y, 32, 25, 64, 51, 1, 1, zebra.rotation);
 				}
 //				font.draw(game.batch, "dropCount: " + Integer.toString(dropCount),10,game.lineH*2);
 //				font.draw(game.batch, "neededDrops: " + Long.toString(neededDrops),10,game.lineH*3);
@@ -265,19 +267,22 @@ public class GameScreen implements Screen {
 				if(dropper.x < 0) dropper.x = 0;
 				if(dropper.x > game.maxW - 64) dropper.x = (game.maxW - 64);
 
-				Iterator<Rectangle> iter = game.raindrops.iterator();
+				Iterator<Zebra> iter = game.zebras.iterator();
 				while(iter.hasNext()) {
-					Rectangle raindrop = iter.next();
-					raindrop.y -= game.dropSpeed * Gdx.graphics.getDeltaTime();
-					if(raindrop.y + 64 < 0) {
+					Zebra zebra = iter.next();
+					zebra.position.y -= game.dropSpeed * Gdx.graphics.getDeltaTime();
+					Vector2 pos = zebra.position;
+					zebra.setPosition(pos);
+					
+					if(zebra.position.y + 64 < 0) {
 						iter.remove();
-						rectPool.free(raindrop);
+						zebraPool.free(zebra);
 						dropLevel();
 					}
-					if(raindrop.overlaps(game.bucketBounds)) {
+					if(zebra.bounds.overlaps(game.bucketBounds)) {
 						game.dropSound.play();
 						iter.remove();
-						rectPool.free(raindrop);
+						zebraPool.free(zebra);
 						game.dropCount++;
 						game.points = game.points + game.ptVal;
 						game.bonus = game.bonus + game.ptVal;

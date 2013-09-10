@@ -11,6 +11,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.jthtml.zebraDrop.GoogleInterface;
+import com.jthtml.zebraDrop.Zebra;
+
 
 public class ZebraDropGame extends Game {
 
@@ -57,7 +59,7 @@ public class ZebraDropGame extends Game {
 
 	Boolean signedIn;
 	
-	Array<Rectangle> raindrops;
+	Array<Zebra> zebras;
 
 	
 	public ZebraDropGame(GoogleInterface aInterface){
@@ -90,7 +92,7 @@ public class ZebraDropGame extends Game {
 		lineH = 70;
 		
 		// Array for our "raindrops"
-		raindrops = new Array<Rectangle>();
+		zebras = new Array<Zebra>();
 
 
 		// create a Rectangle to logically represent the bucket

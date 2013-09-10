@@ -65,7 +65,7 @@ public class PauseScreen implements Screen {
 			touchSpot.x = touchPos.x;
 			touchSpot.y = touchPos.y;
 			if (touchSpot.overlaps(tapItBounds)) {
-				game.raindrops = new Array<Rectangle>();
+				game.zebras = new Array<Zebra>();
 				game.gameState = game.gameState.Normal;			
 				game.setScreen(new GameScreen(game));
 				dispose();

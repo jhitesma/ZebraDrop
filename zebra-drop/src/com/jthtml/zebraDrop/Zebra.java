@@ -1,5 +1,6 @@
 package com.jthtml.zebraDrop;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 
@@ -14,15 +15,15 @@ public class Zebra {
 	Rectangle bounds = new Rectangle();
 	boolean	facingLeft = true;
 	float stateTime = 0;
-
-	public Zebra(Vector2 position, ZebraDropGame gam) {
-		game = gam;
-		this.position = position;
-		this.bounds.x = position.x;
-		this.bounds.y = position.y;
+	int rotation;
+	
+	public Zebra() {
+		this.bounds.x = -10;
+		this.bounds.y = -10;
 		this.bounds.height = HEIGHT;
 		this.bounds.width = WIDTH;
 		this.stateTime = 0f;  	
+		this.rotation = MathUtils.random(-60,60);
 	}
 	
 	public boolean isFacingLeft() {

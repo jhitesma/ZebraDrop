@@ -157,7 +157,7 @@ public class GameOverScreen implements Screen {
 				game.points = 0;
 				game.bonus = 0;
 				game.buckets = 3;	
-				game.raindrops = new Array<Rectangle>();
+				game.zebras = new Array<Zebra>();
 				game.gameState = game.gameState.Normal;	
 				game.dropCount = 0;
 				game.numDropped = 0;
