@@ -1,5 +1,11 @@
 package com.jthtml.zebraDrop;
 
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
+
+
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -12,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
 import com.jthtml.zebraDrop.GoogleInterface;
 import com.jthtml.zebraDrop.Zebra;
+
 
 
 public class ZebraDropGame extends Game {
@@ -49,6 +56,7 @@ public class ZebraDropGame extends Game {
 	Rectangle bucket;
 	Rectangle bucketBounds;
 
+	TweenManager tweenManager;
 	SpriteBatch batch;
 	BitmapFont font;
 	State gameState;
@@ -119,6 +127,8 @@ public class ZebraDropGame extends Game {
 		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
 		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
 		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
+		tweenManager = new TweenManager();
+		Tween.registerAccessor(Zebra.class, new ZebraAccessor());
 		gameState = State.Paused;		
 
 		// load some sounds
@@ -138,6 +148,7 @@ public class ZebraDropGame extends Game {
 		super.render();
 	}
 
+		
 	public void dispose() {
 		batch.dispose();
 		font.dispose();

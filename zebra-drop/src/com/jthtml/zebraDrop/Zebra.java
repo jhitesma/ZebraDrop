@@ -1,5 +1,11 @@
 package com.jthtml.zebraDrop;
 
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.equations.Sine;
+
+
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -24,6 +30,7 @@ public class Zebra {
 		this.bounds.width = WIDTH;
 		this.stateTime = 0f;  	
 		this.rotation = MathUtils.random(-60,60);
+//		Tween.call(zebraCallback).start(game.tweenManager);
 	}
 	
 	public boolean isFacingLeft() {
@@ -59,4 +66,17 @@ public class Zebra {
 	public void update(float delta) {
 		stateTime += delta;
 	}
+
+    private final TweenCallback zebraCallback = new TweenCallback() {
+        @Override
+        public void onEvent(int type, BaseTween<?> source) { 
+            Tween.to(this, ZebraAccessor.ROTATION, 1000)
+                .target(MathUtils.random(-60,60))
+                .ease(Sine.INOUT)
+                .repeatYoyo(1, 0)
+                .setCallback(zebraCallback)
+                .start(game.tweenManager);
+        }
+    };
+
 }
