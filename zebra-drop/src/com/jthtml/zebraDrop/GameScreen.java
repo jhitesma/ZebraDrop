@@ -1,5 +1,7 @@
 package com.jthtml.zebraDrop;
 
+import aurelienribon.tweenengine.Tween;
+
 import com.badlogic.gdx.Screen;
 
 import java.util.Iterator;
@@ -175,7 +177,7 @@ public class GameScreen implements Screen {
 
 	@Override
 	public void render(float delta) {
-
+		game.tweenManager.update(Gdx.graphics.getDeltaTime());
 		if (game.buckets > 0) {
 			// We still have lives available so run the game loop
 			
@@ -236,8 +238,8 @@ public class GameScreen implements Screen {
 					camera.unproject(touchPos);
 					game.bucket.x = touchPos.x - 64 / 2;
 				}
-				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= 200 * Gdx.graphics.getDeltaTime();
-				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += 200 * Gdx.graphics.getDeltaTime();
+				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= (260 * game.level) * Gdx.graphics.getDeltaTime();
+				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += (260 * game.level) * Gdx.graphics.getDeltaTime();
 
 				// make sure the bucket stays within the screen bounds
 				if(game.bucket.x < 0) game.bucket.x = 0;

@@ -70,10 +70,10 @@ public class Zebra {
     private final TweenCallback zebraCallback = new TweenCallback() {
         @Override
         public void onEvent(int type, BaseTween<?> source) { 
-            Tween.to(this, ZebraAccessor.ROTATION, 1000)
+            Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(500,1500))
                 .target(MathUtils.random(-60,60))
                 .ease(Sine.INOUT)
-                .repeatYoyo(1, 0)
+                .repeatYoyo(-1, 0)
                 .setCallback(zebraCallback)
                 .start(game.tweenManager);
         }

@@ -45,10 +45,10 @@ public class GameOverScreen implements Screen {
 		
 		// Setup our Bounds
 		tapItBounds = new Rectangle();
-		tapItBounds.width = 365;
-		tapItBounds.height = 195;
-		tapItBounds.x = (game.maxW/2) - 182 ;
-		tapItBounds.y = (game.maxH/2) - 97 ;
+		tapItBounds.width = 387;
+		tapItBounds.height = 485;
+		tapItBounds.x = (game.maxW/2) - (tapItBounds.width/2) ;
+		tapItBounds.y = (game.maxH/2) - (tapItBounds.height/2) ;
 
 		achivementsBounds = new Rectangle();
 		achivementsBounds.width = 400;

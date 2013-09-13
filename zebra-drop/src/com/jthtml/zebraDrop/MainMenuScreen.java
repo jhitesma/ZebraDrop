@@ -17,6 +17,7 @@ public class MainMenuScreen implements Screen {
 	TextureRegion playControllerImage;
 	TextureRegion backgroundImage;
 	TextureRegion tapitImage;
+	TextureRegion logo;
 	Rectangle tapItBounds;
 	Rectangle achivementsBounds;
 	Rectangle highLevelBounds;
@@ -35,15 +36,16 @@ public class MainMenuScreen implements Screen {
 
 		// Load textures for this screen
 		playControllerImage = game.atlas.findRegion("ic_play_games_badge_green");
-		backgroundImage = game.atlas.findRegion("background");
+		backgroundImage = game.atlas.findRegion("blurred_bg");
 		tapitImage = game.atlas.findRegion("tapit");
+		logo = game.atlas.findRegion("logo");
 
 		// Setup our Bounds
 		tapItBounds = new Rectangle();
-		tapItBounds.width = 365;
-		tapItBounds.height = 195;
-		tapItBounds.x = (game.maxW/2) - 182 ;
-		tapItBounds.y = (game.maxH/2) - 97 ;
+		tapItBounds.width = 387;
+		tapItBounds.height = 485;
+		tapItBounds.x = (game.maxW/2) - (tapItBounds.width/2) ;
+		tapItBounds.y = (game.maxH/2) - (tapItBounds.height/2) ;
 
 		achivementsBounds = new Rectangle();
 		achivementsBounds.width = 400;
@@ -95,7 +97,7 @@ public class MainMenuScreen implements Screen {
 			touchSpot.x = touchPos.x;
 			touchSpot.y = touchPos.y;
 			if (touchSpot.overlaps(tapItBounds)) {
-				game.setScreen(new GameScreen(game));
+				game.setScreen(new PauseScreen(game));
 				dispose();
 			}
 			if (touchSpot.overlaps(highScoreBounds)) {
@@ -130,7 +132,10 @@ public class MainMenuScreen implements Screen {
 		game.batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
 		game.batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
 		game.batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
-		game.font.draw(game.batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, game.maxH-100);
+		
+		game.batch.draw(logo, game.maxW - 330, game.maxH - 144);
+		//game.font.draw(game.batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, game.maxH-100);
+		
 		game.font.draw(game.batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
 		game.font.draw(game.batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
 		game.font.draw(game.batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		

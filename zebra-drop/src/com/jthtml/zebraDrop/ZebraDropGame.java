@@ -124,8 +124,8 @@ public class ZebraDropGame extends Game {
 	
 	public void create() {
 		batch = new SpriteBatch();
-		font = new BitmapFont(Gdx.files.internal("data/bell_goth_64.fnt"),
-		         Gdx.files.internal("data/bell_goth_64_0.png"), false);
+		font = new BitmapFont(Gdx.files.internal("data/hvd_poster_50.fnt"),
+		         Gdx.files.internal("data/hvd_poster_50_0.png"), false);
 		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Zebra.class, new ZebraAccessor());

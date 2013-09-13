@@ -1,264 +1,290 @@
 
 zdImages.png
 format: RGBA8888
-filter: MipMapLinearNearest,Nearest
+filter: Nearest,Nearest
 repeat: none
 background
   rotate: false
-  xy: 1, 1286
+  xy: 1, 1317
   size: 1280, 720
   orig: 1280, 720
   offset: 0, 0
   index: -1
-screen01
+blurred_bg
   rotate: false
-  xy: 1, 564
+  xy: 1, 595
   size: 1280, 720
   orig: 1280, 720
-  offset: 0, 0
-  index: -1
-gameover
-  rotate: false
-  xy: 1283, 1811
-  size: 365, 195
-  orig: 365, 195
   offset: 0, 0
   index: -1
 tapit
   rotate: false
-  xy: 1, 367
+  xy: 1283, 1552
+  size: 387, 485
+  orig: 387, 485
+  offset: 0, 0
+  index: -1
+divider_lines
+  rotate: false
+  xy: 1, 391
+  size: 565, 202
+  orig: 565, 202
+  offset: 0, 0
+  index: -1
+gameover
+  rotate: false
+  xy: 1283, 1355
   size: 365, 195
   orig: 365, 195
   offset: 0, 0
   index: -1
+logo
+  rotate: false
+  xy: 1672, 1903
+  size: 320, 134
+  orig: 320, 134
+  offset: 0, 0
+  index: -1
 ufo1
   rotate: false
-  xy: 1283, 1681
+  xy: 1, 261
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo10
   rotate: false
-  xy: 1650, 1878
+  xy: 568, 465
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo11
   rotate: false
-  xy: 1, 237
+  xy: 1283, 1225
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo12
   rotate: false
-  xy: 368, 434
+  xy: 1672, 1773
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo2
   rotate: false
-  xy: 1283, 1551
+  xy: 1, 131
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo3
   rotate: false
-  xy: 1413, 1681
+  xy: 131, 261
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo4
   rotate: false
-  xy: 1780, 1878
+  xy: 698, 465
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo5
   rotate: false
-  xy: 1, 107
+  xy: 1283, 1095
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo6
   rotate: false
-  xy: 131, 237
+  xy: 1413, 1225
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo7
   rotate: false
-  xy: 498, 434
+  xy: 1672, 1643
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo8
   rotate: false
-  xy: 1283, 1421
+  xy: 1802, 1773
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 ufo9
   rotate: false
-  xy: 1413, 1551
+  xy: 1, 1
   size: 128, 128
   orig: 128, 128
   offset: 0, 0
   index: -1
 bucket
   rotate: false
-  xy: 1650, 1812
+  xy: 568, 399
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_play_games_badge_gray
   rotate: false
-  xy: 368, 368
+  xy: 131, 195
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_play_games_badge_green
   rotate: false
-  xy: 1543, 1745
+  xy: 261, 325
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 ic_play_games_badge_white
   rotate: false
-  xy: 1910, 1942
+  xy: 828, 529
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 hero00
   rotate: false
-  xy: 1, 54
+  xy: 1283, 1042
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero01
   rotate: false
-  xy: 131, 184
+  xy: 1413, 1172
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero02
   rotate: false
-  xy: 261, 314
+  xy: 1543, 1302
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero03
   rotate: false
-  xy: 628, 511
+  xy: 1672, 1590
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero04
   rotate: false
-  xy: 1283, 1368
+  xy: 1802, 1720
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero05
   rotate: false
-  xy: 1413, 1498
+  xy: 634, 412
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero06
   rotate: false
-  xy: 1716, 1825
+  xy: 131, 142
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero07
   rotate: false
-  xy: 434, 381
+  xy: 261, 272
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero08
   rotate: false
-  xy: 1543, 1692
+  xy: 327, 338
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero09
   rotate: false
-  xy: 1910, 1889
+  xy: 828, 476
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero10
   rotate: false
-  xy: 1976, 1955
+  xy: 894, 542
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero11
   rotate: false
-  xy: 1, 1
+  xy: 1283, 989
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero12
   rotate: false
-  xy: 131, 131
+  xy: 1413, 1119
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero13
   rotate: false
-  xy: 261, 261
+  xy: 1543, 1249
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero14
   rotate: false
-  xy: 628, 458
+  xy: 1802, 1667
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero15
   rotate: false
-  xy: 694, 511
+  xy: 700, 412
   size: 64, 51
   orig: 64, 51
   offset: 0, 0
   index: -1
 hero16
   rotate: false
-  xy: 1283, 1315
+  xy: 131, 89
   size: 64, 51
   orig: 64, 51
+  offset: 0, 0
+  index: -1
+
+zdImages2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+screen01
+  rotate: false
+  xy: 1, 1
+  size: 1280, 720
+  orig: 1280, 720
   offset: 0, 0
   index: -1
