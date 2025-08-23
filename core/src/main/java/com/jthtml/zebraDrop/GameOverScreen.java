@@ -127,9 +127,12 @@ public class GameOverScreen implements Screen {
 	
 	@Override
 	public void render(float delta) {		
-		// GAME OVER
-		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+		// GAME OVER - lighter background for better text readability
+		Gdx.gl.glClearColor(0.3f, 0.3f, 0.5f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		// Set font to white for better visibility on dark background
+		game.font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// tell the camera to update its matrices.
 		camera.update();
@@ -180,13 +183,20 @@ public class GameOverScreen implements Screen {
 
 		// begin a new batch and draw the bucket and all drops
 		game.batch.begin();
-		game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
-		game.font.draw(game.batch, "HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel), game.maxW/2 - 160, game.lineH);
-		game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);	
+		
+		// Draw UI elements first with normal color
 		game.batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
 		game.batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
 		game.batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
 		game.batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
+		game.batch.draw(gameOverImage, (game.maxW/2) - 182, (game.maxH/2) - 97);
+		
+		// Set batch color to white for text rendering
+		game.batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+		
+		game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
+		game.font.draw(game.batch, "HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel), game.maxW/2 - 160, game.lineH);
+		game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);	
 		if (newPref) {
 			game.font.draw(game.batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
 		}
@@ -198,8 +208,10 @@ public class GameOverScreen implements Screen {
 			game.font.draw(game.batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
 		} else {
 			game.font.draw(game.batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
-		}			
-		game.batch.draw(gameOverImage, (game.maxW/2) - 182, (game.maxH/2) - 97);
+		}		
+		
+		// Reset batch color to white for normal drawing
+		game.batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
 		game.batch.end();
 	}
 
@@ -214,6 +226,8 @@ public class GameOverScreen implements Screen {
 
 	@Override
 	public void hide() {
+		// Restore original font color (black) when leaving this screen
+		game.font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	@Override
