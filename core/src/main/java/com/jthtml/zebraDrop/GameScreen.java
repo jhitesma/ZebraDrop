@@ -144,6 +144,8 @@ public class GameScreen implements Screen {
 			zebra.bounds.width = 52;
 			zebra.bounds.height = 42;
 			zebra.stateTime = game.stateTime;
+			zebra.setTweenManager(game.tweenManager);
+			zebra.startRotation();
 			game.zebras.add(zebra);
 			lastDropTime = TimeUtils.nanoTime();
 			game.numDropped++;

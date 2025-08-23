@@ -3,6 +3,7 @@ package com.jthtml.zebraDrop;
 import aurelienribon.tweenengine.BaseTween;
 import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.TweenManager;
 import aurelienribon.tweenengine.equations.Sine;
 
 import com.badlogic.gdx.math.MathUtils;
@@ -13,8 +14,9 @@ public class Zebra {
 
 	public static final int WIDTH = 52; 
 	public static final int HEIGHT = 42;
+	private static final int MAX_ROTATION = 50;
 
-	ZebraDropGame game;
+	private TweenManager tweenManager;
 
 	Vector2	position = new Vector2();
 	Rectangle bounds = new Rectangle();
@@ -28,7 +30,22 @@ public class Zebra {
 		this.bounds.height = HEIGHT;
 		this.bounds.width = WIDTH;
 		this.stateTime = 0f;  	
-		this.rotation = MathUtils.random(-60,60);
+		this.rotation = MathUtils.random(-MAX_ROTATION, MAX_ROTATION);
+	}
+	
+	public void setTweenManager(TweenManager tweenManager) {
+		this.tweenManager = tweenManager;
+	}
+	
+	public void startRotation() {
+		if (tweenManager != null) {
+			Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(500, 1500))
+				.target(MathUtils.random(-MAX_ROTATION, MAX_ROTATION))
+				.ease(Sine.INOUT)
+				.repeatYoyo(-1, 0)
+				.setCallback(zebraCallback)
+				.start(tweenManager);
+		}
 	}
 	
 	public boolean isFacingLeft() {
@@ -68,12 +85,14 @@ public class Zebra {
     private final TweenCallback zebraCallback = new TweenCallback() {
         @Override
         public void onEvent(int type, BaseTween<?> source) { 
-            Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(500,1500))
-                .target(MathUtils.random(-60,60))
-                .ease(Sine.INOUT)
-                .repeatYoyo(-1, 0)
-                .setCallback(zebraCallback)
-                .start(game.tweenManager);
+            if (tweenManager != null) {
+                Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(500, 1500))
+                    .target(MathUtils.random(-MAX_ROTATION, MAX_ROTATION))
+                    .ease(Sine.INOUT)
+                    .repeatYoyo(-1, 0)
+                    .setCallback(zebraCallback)
+                    .start(tweenManager);
+            }
         }
     };
 
