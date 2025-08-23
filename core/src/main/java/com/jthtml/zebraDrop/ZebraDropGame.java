@@ -10,6 +10,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -140,8 +141,19 @@ public class ZebraDropGame extends Game {
 		atlas = assetManager.get("zdImages.atlas", TextureAtlas.class);
 		dropSound = assetManager.get("drop.wav", Sound.class);
 		rainMusic = assetManager.get("rain.mp3", Music.class);
-		font = new BitmapFont(Gdx.files.internal("data/hvd_poster_32.fnt"),
-		         Gdx.files.internal("data/hvd_poster_32_0.png"), false);
+		
+		// Try to load font through AssetManager, with fallback for compatibility
+		try {
+			font = assetManager.get("data/hvd_poster_32.fnt", BitmapFont.class);
+			// Ensure font is properly configured for rendering
+			font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+		} catch (Exception e) {
+			// Fallback to manual loading if AssetManager fails
+			System.out.println("AssetManager font loading failed, using manual loading: " + e.getMessage());
+			font = new BitmapFont(Gdx.files.internal("data/hvd_poster_32.fnt"),
+			         Gdx.files.internal("data/hvd_poster_32_0.png"), false);
+			font.getRegion().getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+		}
 		
 		rainMusic.setLooping(true);
 
@@ -160,6 +172,9 @@ public class ZebraDropGame extends Game {
 		// Load audio assets
 		assetManager.load("drop.wav", Sound.class);
 		assetManager.load("rain.mp3", Music.class);
+		
+		// Load font through AssetManager for better compatibility
+		assetManager.load("data/hvd_poster_32.fnt", BitmapFont.class);
 		
 		// Block until all assets are loaded
 		assetManager.finishLoading();

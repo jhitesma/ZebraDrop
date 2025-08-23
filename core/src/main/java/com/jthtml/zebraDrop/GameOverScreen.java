@@ -3,83 +3,52 @@ package com.jthtml.zebraDrop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class GameOverScreen extends ScreenAdapter {
 	final ZebraDropGame game;
 	private GoogleInterface platformInterface;
 	
-	TextureRegion playControllerImage;
-	TextureRegion backgroundImage;
-	TextureRegion tapitImage;
-	TextureRegion gameOverImage;
-	Rectangle tapItBounds;
-	Rectangle achivementsBounds;
-	Rectangle highLevelBounds;
-	Rectangle highScoreBounds;
-	Rectangle loginBounds;	
-	Rectangle touchSpot;
-	Vector3 touchPos;
-	Boolean newPref;
-
-	OrthographicCamera camera;
+	private Stage stage;
+	private Skin skin;
+	private Table mainTable;
+	private Image gameOverImage;
+	
+	private TextButton achievementsButton;
+	private TextButton highScoreButton;
+	private TextButton highLevelButton;
+	private TextButton loginButton;
+	
+	private Label scoreLabel;
+	private Label highScoreLabel;
+	private Label levelLabel;
+	private Label newRecordLabel;
+	private Label titleLabel;
+	
+	private Boolean newPref;
 	
 	public GameOverScreen(final ZebraDropGame game) {
 		this.game = game;
 		platformInterface = game.getGameInterface();
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, game.maxW, game.maxH);
-
-		// Load textures for this screen
-		playControllerImage = game.atlas.findRegion("ic_play_games_badge_green");
-		backgroundImage = game.atlas.findRegion("background");
-		tapitImage = game.atlas.findRegion("tapit");
-		gameOverImage = game.atlas.findRegion("gameover");
 		newPref = false;
 		
-		// Setup our Bounds
-		tapItBounds = new Rectangle();
-		tapItBounds.width = 387;
-		tapItBounds.height = 485;
-		tapItBounds.x = (game.maxW/2) - (tapItBounds.width/2) ;
-		tapItBounds.y = (game.maxH/2) - (tapItBounds.height/2) ;
-
-		achivementsBounds = new Rectangle();
-		achivementsBounds.width = 400;
-		achivementsBounds.height = 64;
-		achivementsBounds.x = 35;
-		achivementsBounds.y = game.maxH-150;		
-
-		highScoreBounds = new Rectangle();
-		highScoreBounds.width = 400;
-		highScoreBounds.height = 64;
-		highScoreBounds.x = achivementsBounds.x ;
-		highScoreBounds.y = achivementsBounds.y - 75;
-
-		highLevelBounds = new Rectangle();
-		highLevelBounds.width = 400;
-		highLevelBounds.height = 64;
-		highLevelBounds.x = achivementsBounds.x ;
-		highLevelBounds.y = highScoreBounds.y-75;
+		// Create stage with FitViewport for responsive scaling
+		stage = new Stage(new FitViewport(game.maxW, game.maxH));
+		Gdx.input.setInputProcessor(stage);
 		
-		loginBounds = new Rectangle();
-		loginBounds.width = 200;
-		loginBounds.height = 64;
-		loginBounds.x = achivementsBounds.x ;
-		loginBounds.y = highLevelBounds.y-75;			
-
-		// Setup our touchspot
-		touchSpot = new Rectangle();
-		touchSpot.width = 16;
-		touchSpot.height = 16;
-		
-		touchPos = new Vector3();
-
-		game.stateTime = 0f;  	
+		// Game over logic (preserve original behavior)
+		game.stateTime = 0f;
 
 		if (game.points > game.highScore) {
 			game.highScore = game.points;
@@ -89,8 +58,7 @@ public class GameOverScreen extends ScreenAdapter {
 				platformInterface.submitScore(game.highScore);
 			}
 		}
-		
-		
+
 		if (game.level > game.highLevel) {
 			game.highLevel = game.level;
 			game.prefs.putInteger("highLevel", game.highLevel);
@@ -101,27 +69,198 @@ public class GameOverScreen extends ScreenAdapter {
 		}
 
 		if (platformInterface.getSignedIn()) {
+			platformInterface.incrementAchievement(GameConstants.ACHIEVEMENT_GAMES_PLAYED, 1);
 
-			platformInterface.incrementAchievement("CgkIx7_-lMMSEAIQAg",1);
-
-			if (game.points == 1337) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAQ");
+			if (game.points == GameConstants.ACHIEVEMENT_SCORE_1337) {
+				platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_ELITE_SCORE);
 			}
 			
-			if (game.points >= 6826) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+			if (game.points >= GameConstants.ACHIEVEMENT_SCORE_6826) {
+				platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_HIGH_SCORE);			
 			}
 			
-			if (game.level >= 15) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBg");			
+			if (game.level >= GameConstants.ACHIEVEMENT_LEVEL_15) {
+				platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_HIGH_SCORE);			
 			}
 
-			if (game.level == 1) {
-				platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBw");
+			if (game.level == GameConstants.ACHIEVEMENT_LEVEL_1) {
+				platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_FIRST_LEVEL);
 			}			
 		}
 		
 		if (newPref) game.prefs.flush();
+		
+		// Create UI
+		createSkin();
+		createUI();
+	}
+	
+	private void createSkin() {
+		// Create skin for buttons
+		skin = new Skin();
+		skin.add("font", game.font);
+		
+		// Create menu button style (no background - icon is handled in Table)
+		TextButton.TextButtonStyle menuButtonStyle = new TextButton.TextButtonStyle();
+		menuButtonStyle.font = game.font;
+		skin.add("menu", menuButtonStyle);
+		
+		// Create restart button style (with tapit background)
+		TextButton.TextButtonStyle restartButtonStyle = new TextButton.TextButtonStyle();
+		restartButtonStyle.up = new TextureRegionDrawable(game.atlas.findRegion("tapit"));
+		restartButtonStyle.font = game.font;
+		skin.add("restart", restartButtonStyle);
+		
+		// Create label style
+		Label.LabelStyle labelStyle = new Label.LabelStyle();
+		labelStyle.font = game.font;
+		skin.add("default", labelStyle);
+	}
+	
+	private void createUI() {
+		// Create main table for layout
+		mainTable = new Table();
+		mainTable.setFillParent(true);
+		stage.addActor(mainTable);
+		
+		// Create game over image as a separate display element
+		gameOverImage = new Image(game.atlas.findRegion("gameover"));
+		
+		// No separate restart button - the game over image itself is clickable
+		
+		// Create menu buttons with icons
+		achievementsButton = new TextButton("Achievements", skin, "menu");
+		achievementsButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				platformInterface.getAchievements();
+			}
+		});
+		
+		highScoreButton = new TextButton("High Scores", skin, "menu");
+		highScoreButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				platformInterface.getScores();
+			}
+		});
+		
+		highLevelButton = new TextButton("High Levels", skin, "menu");
+		highLevelButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				platformInterface.getLevels();
+			}
+		});
+		
+		loginButton = new TextButton("", skin, "menu");
+		loginButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if (platformInterface.getSignedIn()) {
+					platformInterface.LogOut();
+				} else {
+					platformInterface.Login();
+				}
+			}
+		});
+		
+		// Create labels
+		scoreLabel = new Label("", skin);
+		highScoreLabel = new Label("", skin);
+		levelLabel = new Label("", skin);
+		titleLabel = new Label("ZEBRA DROP!!!", skin);
+		newRecordLabel = new Label("^^NEW RECORDS^^", skin);
+		
+		// Layout the UI
+		layoutUI();
+	}
+	
+	private Table createMenuButtonTable(TextButton button, String text) {
+		// Create table with icon on left, text on right (like original)
+		Table table = new Table();
+		
+		// Add controller icon on left
+		Image icon = new Image(game.atlas.findRegion("ic_play_games_badge_green"));
+		table.add(icon).width(64).height(64).padRight(10);
+		
+		// Add text label on right
+		Label textLabel = new Label(text, skin);
+		table.add(textLabel).left();
+		
+		// Make the whole table clickable by copying the button's click listener
+		if (button.getListeners().size > 0) {
+			table.addListener(button.getListeners().first());
+		}
+		
+		return table;
+	}
+	
+	private void layoutUI() {
+		// Create layout similar to original GameOverScreen
+		
+		// Create split layout: left side for menu, center for game over
+		Table leftSide = new Table();
+		Table centerArea = new Table();
+		
+		// Menu buttons on left side - create icon+text layout like original
+		Table achievementsTable = createMenuButtonTable(achievementsButton, "Achievements");
+		Table highScoreTable = createMenuButtonTable(highScoreButton, "High Scores");
+		Table highLevelTable = createMenuButtonTable(highLevelButton, "High Levels");
+		Table loginTable = createMenuButtonTable(loginButton, "");
+		
+		leftSide.add(achievementsTable).width(400).height(64).padTop(150).row();
+		leftSide.add(highScoreTable).width(400).height(64).padTop(10).row();
+		leftSide.add(highLevelTable).width(400).height(64).padTop(10).row();
+		leftSide.add(loginTable).width(200).height(64).padTop(10);
+		leftSide.top().left();
+		
+		// Center area with game over image and title
+		centerArea.add(titleLabel).pad(10).row();
+		centerArea.add(gameOverImage).pad(10).row();
+		// Make the game over image clickable for restart (like original)
+		gameOverImage.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				// Reset game state (same as playButton)
+				game.bucketBounds.height = GameConstants.BUCKET_HEIGHT;
+				game.dropRate = game.minDropRate;
+				game.dropSpeed = game.minDropSpeed;
+				game.neededDrops = GameConstants.INITIAL_DROPS_NEEDED;
+				game.level = GameConstants.INITIAL_LEVEL;
+				game.dropDir = GameConstants.INITIAL_DROP_DIRECTION;
+				game.ptVal = GameConstants.INITIAL_POINT_VALUE;
+				game.points = 0;
+				game.bonus = 0;
+				game.buckets = GameConstants.INITIAL_BUCKETS;	
+				game.zebras = new Array<Zebra>();
+				game.gameState = ZebraDropGame.State.Normal;	
+				game.dropCount = 0;
+				game.numDropped = 0;
+				game.setScreen(new GameScreen(game));
+				dispose();
+			}
+		});
+		
+		if (newPref) {
+			centerArea.add(newRecordLabel).pad(10).row();
+		}
+		centerArea.center();
+		
+		// Bottom score info like original
+		Table bottomTable = new Table();
+		bottomTable.add(scoreLabel).left().padLeft(20);
+		bottomTable.add(highScoreLabel).center().expandX();
+		bottomTable.add(levelLabel).right().padRight(20);
+		
+		// Main table layout
+		Table contentTable = new Table();
+		contentTable.add(leftSide).width(450).fillY().top();
+		contentTable.add(centerArea).expand().center();
+		
+		// Final layout
+		mainTable.add(contentTable).expand().fill().row();
+		mainTable.add(bottomTable).fillX().bottom().padBottom(20);
 	}
 	
 	
@@ -131,98 +270,37 @@ public class GameOverScreen extends ScreenAdapter {
 		Gdx.gl.glClearColor(0.3f, 0.3f, 0.5f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		// Set font to white for better visibility on dark background
-		game.font.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-		// tell the camera to update its matrices.
-		camera.update();
-
-		// tell the SpriteBatch to render in the coordinate system specified by the camera.
-		game.batch.setProjectionMatrix(camera.combined);
+		// Update labels with current game state
+		scoreLabel.setText(Long.toString(game.points));
+		highScoreLabel.setText("HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel));
+		levelLabel.setText("Level: " + Integer.toString(game.level));
 		
-		if(Gdx.input.isTouched()) {
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			touchSpot.x = touchPos.x;
-			touchSpot.y = touchPos.y;
-			if (touchSpot.overlaps(tapItBounds)) {
-				game.bucketBounds.height = 212;
-				game.dropRate = game.minDropRate;
-				game.dropSpeed = game.minDropSpeed;
-				game.neededDrops = 10;
-				game.level = 1;
-				game.dropDir = 1;
-				game.ptVal = 1;
-				game.points = 0;
-				game.bonus = 0;
-				game.buckets = 3;	
-				game.zebras = new Array<Zebra>();
-				game.gameState = ZebraDropGame.State.Normal;	
-				game.dropCount = 0;
-				game.numDropped = 0;
-				game.setScreen(new GameScreen(game));
-				dispose();
-			}
-			if (touchSpot.overlaps(highScoreBounds)) {
-				platformInterface.getScores();
-			}
-			if (touchSpot.overlaps(highLevelBounds)) {
-				platformInterface.getLevels();
-			}
-			if (touchSpot.overlaps(achivementsBounds)) {
-				platformInterface.getAchievements();
-			}
-			if (touchSpot.overlaps(loginBounds)) {
-				if (platformInterface.getSignedIn()) {
-					platformInterface.LogOut();
-				} else {
-					platformInterface.Login();
-				}
-			}
-		}
-
-		// begin a new batch and draw the bucket and all drops
-		game.batch.begin();
-		
-		// Draw UI elements first with normal color
-		game.batch.draw(playControllerImage, achivementsBounds.x, achivementsBounds.y);
-		game.batch.draw(playControllerImage, highScoreBounds.x, highScoreBounds.y);
-		game.batch.draw(playControllerImage, loginBounds.x, loginBounds.y);
-		game.batch.draw(playControllerImage, highLevelBounds.x, highLevelBounds.y);
-		game.batch.draw(gameOverImage, (game.maxW/2) - 182, (game.maxH/2) - 97);
-		
-		// Set batch color to white for text rendering
-		game.batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-		
-		game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
-		game.font.draw(game.batch, "HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel), game.maxW/2 - 160, game.lineH);
-		game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);	
-		if (newPref) {
-			game.font.draw(game.batch,"^^NEW RECORDS^^", loginBounds.x+40, loginBounds.y + loginBounds.height - 115);
-		}
-		game.font.draw(game.batch, "ZEBRA DROP!!!", tapItBounds.x + tapItBounds.width, game.maxH-100);
-		game.font.draw(game.batch, "Achievements", achivementsBounds.x + 70, achivementsBounds.y + achivementsBounds.height - 12);
-		game.font.draw(game.batch, "High Scores", highScoreBounds.x + 70, highScoreBounds.y + highScoreBounds.height - 12);		
-		game.font.draw(game.batch, "High Levels", highLevelBounds.x + 70, highLevelBounds.y + highLevelBounds.height - 12);		
+		// Update login button text
 		if (platformInterface.getSignedIn()) {
-			game.font.draw(game.batch, "Logout", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
+			loginButton.setText("Logout");
 		} else {
-			game.font.draw(game.batch, "Login", loginBounds.x + 70, loginBounds.y + loginBounds.height - 12);		
-		}		
+			loginButton.setText("Login");
+		}
 		
-		// Reset batch color to white for normal drawing
-		game.batch.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-		game.batch.end();
+		// Update and render stage
+		stage.act(delta);
+		stage.draw();
 	}
 
 	@Override
 	public void show() {
-		game.rainMusic.stop();			
+		game.rainMusic.stop();
+		Gdx.input.setInputProcessor(stage);
 	}
 
 	@Override
 	public void hide() {
-		// Restore original font color (black) when leaving this screen
-		game.font.setColor(0.0f, 0.0f, 0.0f, 1.0f);
+		// Font color is now managed by scene2d labels, no need to manually reset
+	}
+	
+	@Override
+	public void dispose() {
+		stage.dispose();
+		skin.dispose();
 	}
 }

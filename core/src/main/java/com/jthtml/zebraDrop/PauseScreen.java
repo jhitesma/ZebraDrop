@@ -3,45 +3,100 @@ package com.jthtml.zebraDrop;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class PauseScreen extends ScreenAdapter {
 	final ZebraDropGame game;
 
-	TextureRegion backgroundImage;
-	TextureRegion tapitImage;
-	Rectangle tapItBounds;
-	Rectangle touchSpot;
-	Vector3 touchPos;
-
-	OrthographicCamera camera;
+	private Stage stage;
+	private Skin skin;
+	private Table mainTable;
+	private Image backgroundImage;
+	private TextButton continueButton;
+	private Label scoreLabel;
+	private Label highScoreLabel;
+	private Label levelLabel;
+	private Label dropsLabel;
 	
 	public PauseScreen(final ZebraDropGame game) {
 		this.game = game;
-		camera = new OrthographicCamera();
-		camera.setToOrtho(false, game.maxW, game.maxH);
-
-		// Load textures for this screen
-		backgroundImage = game.atlas.findRegion("background");
-		tapitImage = game.atlas.findRegion("tapit");
-
-		// Setup our Bounds
-		tapItBounds = new Rectangle();
-		tapItBounds.width = 387;
-		tapItBounds.height = 485;
-		tapItBounds.x = (game.maxW/2) - (tapItBounds.width/2) ;
-		tapItBounds.y = (game.maxH/2) - (tapItBounds.height/2) ;
-
-		// Setup our touchspot
-		touchSpot = new Rectangle();
-		touchSpot.width = 16;
-		touchSpot.height = 16;
 		
-		touchPos = new Vector3();
+		// Create stage with FitViewport for responsive scaling
+		stage = new Stage(new FitViewport(game.maxW, game.maxH));
+		Gdx.input.setInputProcessor(stage);
+		
+		// Create skin
+		skin = new Skin();
+		skin.add("font", game.font);
+		
+		// Create button style
+		TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
+		buttonStyle.up = new TextureRegionDrawable(game.atlas.findRegion("tapit"));
+		buttonStyle.font = game.font;
+		skin.add("default", buttonStyle);
+		
+		// Create label style
+		Label.LabelStyle labelStyle = new Label.LabelStyle();
+		labelStyle.font = game.font;
+		skin.add("default", labelStyle);
+		
+		createUI();
+	}
+	
+	private void createUI() {
+		// Create background
+		backgroundImage = new Image(game.atlas.findRegion("background"));
+		backgroundImage.setFillParent(true);
+		stage.addActor(backgroundImage);
+		
+		// Create main table for layout
+		mainTable = new Table();
+		mainTable.setFillParent(true);
+		stage.addActor(mainTable);
+		
+		// Create continue button
+		continueButton = new TextButton("", skin);
+		continueButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.zebras = new Array<Zebra>();
+				game.gameState = ZebraDropGame.State.Normal;			
+				game.setScreen(new GameScreen(game));
+				dispose();
+			}
+		});
+		
+		// Create labels
+		scoreLabel = new Label("", skin);
+		highScoreLabel = new Label("", skin);
+		levelLabel = new Label("", skin);
+		dropsLabel = new Label("", skin);
+		
+		// Layout the UI
+		layoutUI();
+	}
+	
+	private void layoutUI() {
+		// Bottom section with score info like original
+		Table bottomTable = new Table();
+		bottomTable.add(levelLabel).left().padLeft(20);           // Level on LEFT
+		bottomTable.add(highScoreLabel).center().expandX();
+		bottomTable.add(dropsLabel).right().padRight(20);         // Drops needed on RIGHT
+		
+		// Main layout
+		mainTable.center();
+		mainTable.add(continueButton).size(387, 485).center().expand().row();
+		mainTable.add(bottomTable).fillX().bottom().padBottom(20);
 	}
 	
 	
@@ -50,35 +105,24 @@ public class PauseScreen extends ScreenAdapter {
 		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		// tell the camera to update its matrices.
-		camera.update();
+		// Update labels with current game state
+		levelLabel.setText("Level: " + Integer.toString(game.level));
+		highScoreLabel.setText("HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel));
+		dropsLabel.setText(Long.toString(game.neededDrops) + " to drop");
 
-		// tell the SpriteBatch to render in the
-		// coordinate system specified by the camera.
-		game.batch.setProjectionMatrix(camera.combined);
-
-		if(Gdx.input.isTouched()) {
-			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
-			camera.unproject(touchPos);
-			touchSpot.x = touchPos.x;
-			touchSpot.y = touchPos.y;
-			if (touchSpot.overlaps(tapItBounds)) {
-				game.zebras = new Array<Zebra>();
-				game.gameState = ZebraDropGame.State.Normal;			
-				game.setScreen(new GameScreen(game));
-				dispose();
-			}
-		}
-
-		// begin a new batch and draw the bucket and all drops
-		game.batch.begin();
-		game.batch.draw(backgroundImage, 0, 0);
-		game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
-		game.font.draw(game.batch, "HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel), game.maxW/2 - 160, game.lineH);
-		game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);		
-		game.batch.draw(tapitImage, tapItBounds.x, tapItBounds.y);				
-		game.batch.end();		
+		// Update and render stage
+		stage.act(delta);
+		stage.draw();
 	}
-
-
+	
+	@Override
+	public void show() {
+		Gdx.input.setInputProcessor(stage);
+	}
+	
+	@Override
+	public void dispose() {
+		stage.dispose();
+		skin.dispose();
+	}
 }

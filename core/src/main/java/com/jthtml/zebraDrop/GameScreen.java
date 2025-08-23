@@ -49,6 +49,7 @@ public class GameScreen extends ScreenAdapter {
 
 	Vector3 touchPos;
 	
+	
 	TextureRegion zebraFrame;
 	private Animation<TextureRegion> zebraAnimation;
 	
@@ -119,6 +120,37 @@ public class GameScreen extends ScreenAdapter {
 		// Initialize string builders for performance
 		fpsStringBuilder = new StringBuilder("FPS: ");
 		levelStringBuilder = new StringBuilder("Level: ");
+	}
+	
+	private void drawHUD() {
+		// Draw HUD text within existing batch (no separate batch needed)
+		// Use original game.lineH height to match PauseScreen
+		float textY = game.lineH; // Match original height
+		
+		// Update FPS with caching to avoid allocations
+		int currentFps = Gdx.graphics.getFramesPerSecond();
+		if (currentFps != lastFps) {
+			fpsStringBuilder.setLength(5); // Reset to "FPS: "
+			fpsStringBuilder.append(currentFps);
+			lastFps = currentFps;
+		}
+		
+		// Level display on far LEFT
+		if (game.level != lastLevel) {
+			levelStringBuilder.setLength(7); // Reset to "Level: "
+			levelStringBuilder.append(game.level);
+			lastLevel = game.level;
+		}
+		game.font.draw(game.batch, levelStringBuilder.toString(), 20, textY);
+		
+		// FPS in center-left
+		game.font.draw(game.batch, fpsStringBuilder.toString(), game.maxW/2 - 200, textY);
+		
+		// Score next to FPS with proper spacing
+		game.font.draw(game.batch, "Score: " + Long.toString(game.points), game.maxW/2 - 50, textY);
+		
+		// Drops needed display on far RIGHT
+		game.font.draw(game.batch, Long.toString(game.neededDrops) + " to drop", game.maxW-(8*30), textY);
 	}
 
 	private void newLevel() {
@@ -217,23 +249,8 @@ public class GameScreen extends ScreenAdapter {
 					game.batch.draw(zebraFrame, zebra.position.x, zebra.position.y, 32, 25, 64, 51, 1, 1, zebra.rotation);
 				}
 
-				// Use cached string builders to avoid allocation
-				int currentFps = Gdx.graphics.getFramesPerSecond();
-				if (currentFps != lastFps) {
-					fpsStringBuilder.setLength(5); // Reset to "FPS: "
-					fpsStringBuilder.append(currentFps);
-					lastFps = currentFps;
-				}
-				game.font.draw(game.batch, fpsStringBuilder.toString(), game.maxW/2 - 200, game.lineH);
-				
-				game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
-				
-				if (game.level != lastLevel) {
-					levelStringBuilder.setLength(7); // Reset to "Level: "
-					levelStringBuilder.append(game.level);
-					lastLevel = game.level;
-				}
-				game.font.draw(game.batch, levelStringBuilder.toString(), game.maxW-(8*30), game.lineH);
+				// Draw HUD in same batch to avoid font rendering issues
+				drawHUD();
 
 				game.batch.end();
 
@@ -361,5 +378,10 @@ public class GameScreen extends ScreenAdapter {
 	@Override
 	public void hide() {
 		game.rainMusic.stop();
+	}
+	
+	@Override
+	public void dispose() {
+		// No HUD resources to dispose of - using original manual drawing
 	}
 }
