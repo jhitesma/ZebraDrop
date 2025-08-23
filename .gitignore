@@ -9,3 +9,11 @@ zebra-drop-keystore
 *.apk
 zebra-drop-android/bin
 zebra-drop-android/gen
+
+# Build directories
+build/
+*/build/
+
+# macOS
+.DS_Store
+*/.DS_Store
