@@ -16,6 +16,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.Pool;
 
@@ -76,20 +77,20 @@ public class GameScreen extends ScreenAdapter {
 		backgroundImage = game.atlas.findRegion("background");
 		
 		game.stateTime = 0f;  
-		TextureRegion[] zebraFrames = new TextureRegion[16];
+		Array<TextureRegion> zebraFrames = new Array<TextureRegion>();
 		for (int i = 0 ; i < 16  ; i++) {
 			if (i+1 < 10) {
-				zebraFrames[i] = game.atlas.findRegion("hero0" + (i+1));	
+				zebraFrames.add(game.atlas.findRegion("hero0" + (i+1)));	
 			}
 			else {
-				zebraFrames[i] = game.atlas.findRegion("hero" + (i+1));
+				zebraFrames.add(game.atlas.findRegion("hero" + (i+1)));
 			}
 		}
 		zebraAnimation = new Animation<TextureRegion>(ZEBRA_FRAME_DURATION, zebraFrames);
 		
-		TextureRegion[] ufoFrames = new TextureRegion[12];
+		Array<TextureRegion> ufoFrames = new Array<TextureRegion>();
 		for (int i = 0 ; i < 12  ; i++) {
-			ufoFrames[i] = game.atlas.findRegion("ufo" + (i+1));
+			ufoFrames.add(game.atlas.findRegion("ufo" + (i+1)));
 			Gdx.app.log("texture_load", i + " - ufo" + (i+1));
 		}
 		ufoAnimation = new Animation<TextureRegion>(UFO_FRAME_DURATION, ufoFrames);
