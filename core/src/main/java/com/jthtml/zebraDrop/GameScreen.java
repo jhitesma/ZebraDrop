@@ -271,19 +271,19 @@ public class GameScreen implements Screen {
 						game.bonus = game.bonus + game.ptVal;
 
 						if (platformInterface.getSignedIn()) {
-							if (game.points >= 3000) {
-								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQAw");
+							if (game.points >= GameConstants.SCORE_THRESHOLD_3000) {
+								platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_SCORE_3000);
 							}
 	
-							if (game.points >= 10000) {
-								platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBA");
+							if (game.points >= GameConstants.SCORE_THRESHOLD_10000) {
+								platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_SCORE_10000);
 							}
 						}
 							
-						if (game.bonus >= 1000) {
+						if (game.bonus >= GameConstants.BONUS_THRESHOLD) {
 							if (game.buckets < 3) {
 								if (platformInterface.getSignedIn()) {
-									platformInterface.unlockAchievement("CgkIx7_-lMMSEAIQBQ");
+									platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_BUCKET_BONUS);
 								}
 								game.buckets++;
 								game.bucketBounds.height = game.bucketBounds.height + 84;
