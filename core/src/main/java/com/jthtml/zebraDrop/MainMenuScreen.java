@@ -97,15 +97,12 @@ public class MainMenuScreen implements Screen {
 			}
 			if (touchSpot.overlaps(highScoreBounds)) {
 				platformInterface.getScores();
-				dispose();
 			}
 			if (touchSpot.overlaps(highLevelBounds)) {
 				platformInterface.getLevels();
-				dispose();
 			}
 			if (touchSpot.overlaps(achivementsBounds)) {
 				platformInterface.getAchievements();
-				dispose();
 			}
 			if (touchSpot.overlaps(loginBounds)) {
 				if (platformInterface.getSignedIn()) {
