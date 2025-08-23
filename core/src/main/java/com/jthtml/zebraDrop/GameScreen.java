@@ -56,8 +56,8 @@ public class GameScreen implements Screen {
 	};
 	
 	
-	public GameScreen(ZebraDropGame gam){
-		game = gam;
+	public GameScreen(ZebraDropGame game){
+		this.game = game;
 		platformInterface = game.getGameInterface();
 
 		// load the images for the droplet and the bucket, 64x64 pixels each
@@ -90,38 +90,38 @@ public class GameScreen implements Screen {
 
 		// setup our touchspot
 		touchSpot = new Rectangle();
-		touchSpot.width = 16;
-		touchSpot.height = 16;
+		touchSpot.width = GameConstants.TOUCH_SPOT_SIZE;
+		touchSpot.height = GameConstants.TOUCH_SPOT_SIZE;
 
 		touchPos = new Vector3();
 		
 		// create the dropper
 		dropper = new Rectangle();
-		dropper.x = game.maxW / 2 - 64 /2; // start out centered
-		dropper.y = game.maxH - 120; 
-		dropper.width = 64;
-		dropper.height = 64;
+		dropper.x = game.maxW / 2 - GameConstants.BUCKET_SIZE / 2; // start out centered
+		dropper.y = game.maxH - GameConstants.UFO_DROP_HEIGHT; 
+		dropper.width = GameConstants.BUCKET_SIZE;
+		dropper.height = GameConstants.BUCKET_SIZE;
 	}
 
 	private void newLevel() {
-		game.gameState = game.gameState.Paused;		   
+		game.gameState = ZebraDropGame.State.Paused;		   
 		if (game.neededDrops == ((game.level -1) *10) /2) {
 		} else {
 			game.level = game.level + 1;
 		}
 		game.dropRate = game.dropRate / 2 ;
 		if (game.dropRate < game.maxDropRate) {game.dropRate = game.maxDropRate;}
-		game.dropSpeed = game.minDropSpeed + (game.level * 50);
+		game.dropSpeed = game.minDropSpeed + (game.level * GameConstants.LEVEL_SPEED_INCREMENT);
 		if (game.dropSpeed > game.maxDropSpeed) {game.dropSpeed = game.maxDropSpeed;}
 		game.dropCount = 0;
-		game.neededDrops = game.level * 10;
+		game.neededDrops = game.level * GameConstants.DROPS_PER_LEVEL_BASE;
 		game.ptVal = game.ptVal + 1;
-		if (game.ptVal > 8) {game.ptVal = 8;}
+		if (game.ptVal > GameConstants.MAX_POINT_VALUE) {game.ptVal = GameConstants.MAX_POINT_VALUE;}
 		game.numDropped = 0;
 	}
 
 	private void dropLevel() {
-		game.gameState = game.gameState.Paused;
+		game.gameState = ZebraDropGame.State.Paused;
 		game.buckets = game.buckets - 1;
 		if (game.buckets < 1) { game.buckets = 0;}
 
@@ -131,12 +131,12 @@ public class GameScreen implements Screen {
 		game.dropSpeed = game.minDropSpeed;
 		if (game.dropSpeed < game.minDropSpeed) { game.dropSpeed = game.minDropSpeed;}
 
-		game.bucketBounds.height = game.bucketBounds.height - 84;
+		game.bucketBounds.height = game.bucketBounds.height - GameConstants.BUCKET_STACK_HEIGHT;
 		game.ptVal = game.ptVal - 1;
 		if (game.ptVal < 1) game.ptVal = 1;
 		game.dropCount = 0;
-		game.neededDrops = 10;
-		if (game.neededDrops < 10) { game.neededDrops = 10;}
+		game.neededDrops = GameConstants.DROPS_PER_LEVEL_BASE;
+		if (game.neededDrops < GameConstants.DROPS_PER_LEVEL_BASE) { game.neededDrops = GameConstants.DROPS_PER_LEVEL_BASE;}
 		game.numDropped = 0;
 	}
 
@@ -179,7 +179,7 @@ public class GameScreen implements Screen {
 		if (game.buckets > 0) {
 			// We still have lives available so run the game loop
 			
-			if (game.gameState == game.gameState.Paused) {
+			if (game.gameState == ZebraDropGame.State.Paused) {
 				game.setScreen(new PauseScreen(game));
 				dispose();
 			} else {
@@ -201,10 +201,10 @@ public class GameScreen implements Screen {
 				game.batch.draw(bucketImage, game.bucket.x, game.bucket.y);
 
 				if (game.buckets >= 2) {
-					game.batch.draw(bucketImage, game.bucket.x, game.bucket.y + 84);
+					game.batch.draw(bucketImage, game.bucket.x, game.bucket.y + GameConstants.BUCKET_STACK_HEIGHT);
 				}
 				if (game.buckets >= 3) {
-					game.batch.draw(bucketImage, game.bucket.x, game.bucket.y + 168);
+					game.batch.draw(bucketImage, game.bucket.x, game.bucket.y + GameConstants.BUCKET_STACK_HEIGHT * 2);
 				}
 				
 				game.batch.draw(ufoFrame, dropper.x, dropper.y);
@@ -225,14 +225,14 @@ public class GameScreen implements Screen {
 				if(Gdx.input.isTouched()) {
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 					camera.unproject(touchPos);
-					game.bucket.x = touchPos.x - 64 / 2;
+					game.bucket.x = touchPos.x - GameConstants.BUCKET_SIZE / 2;
 				}
-				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= (260 * game.level) * Gdx.graphics.getDeltaTime();
-				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += (260 * game.level) * Gdx.graphics.getDeltaTime();
+				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= (GameConstants.BUCKET_MOVEMENT_SPEED * game.level) * Gdx.graphics.getDeltaTime();
+				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += (GameConstants.BUCKET_MOVEMENT_SPEED * game.level) * Gdx.graphics.getDeltaTime();
 
 				// make sure the bucket stays within the screen bounds
 				if(game.bucket.x < 0) game.bucket.x = 0;
-				if(game.bucket.x > game.maxW - 64) game.bucket.x = (game.maxW - 64);
+				if(game.bucket.x > game.maxW - GameConstants.BUCKET_SIZE) game.bucket.x = (game.maxW - GameConstants.BUCKET_SIZE);
 
 				game.bucketBounds.x = game.bucket.x;
 				
@@ -248,9 +248,9 @@ public class GameScreen implements Screen {
 				}
 
 				if (game.dropDir==1) {
-					dropper.x -= MathUtils.random(200 * game.level, 250 * game.level) * Gdx.graphics.getDeltaTime();
+					dropper.x -= MathUtils.random(GameConstants.BASE_MOVEMENT_SPEED * game.level, GameConstants.MOVEMENT_SPEED_RANGE * game.level) * Gdx.graphics.getDeltaTime();
 				} else {
-					dropper.x += MathUtils.random(200 * game.level, 250 * game.level) * Gdx.graphics.getDeltaTime();	      
+					dropper.x += MathUtils.random(GameConstants.BASE_MOVEMENT_SPEED * game.level, GameConstants.MOVEMENT_SPEED_RANGE * game.level) * Gdx.graphics.getDeltaTime();	      
 				}
 
 				// make sure the dropper stays within the screen bounds
@@ -288,14 +288,14 @@ public class GameScreen implements Screen {
 						}
 							
 						if (game.bonus >= GameConstants.BONUS_THRESHOLD) {
-							if (game.buckets < 3) {
+							if (game.buckets < GameConstants.MAX_BUCKETS) {
 								if (platformInterface.getSignedIn()) {
 									platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_BUCKET_BONUS);
 								}
 								game.buckets++;
-								game.bucketBounds.height = game.bucketBounds.height + 84;
-								if (game.bucketBounds.height > 212) {
-									game.bucketBounds.height = 212;
+								game.bucketBounds.height = game.bucketBounds.height + GameConstants.BUCKET_STACK_HEIGHT;
+								if (game.bucketBounds.height > GameConstants.DEFAULT_BUCKET_BOUNDS_HEIGHT) {
+									game.bucketBounds.height = GameConstants.DEFAULT_BUCKET_BOUNDS_HEIGHT;
 								}
 							}
 							game.bonus = 0;

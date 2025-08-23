@@ -20,8 +20,8 @@ public class PauseScreen implements Screen {
 
 	OrthographicCamera camera;
 	
-	public PauseScreen(final ZebraDropGame gam) {
-		game = gam;
+	public PauseScreen(final ZebraDropGame game) {
+		this.game = game;
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, game.maxW, game.maxH);
 
@@ -64,7 +64,7 @@ public class PauseScreen implements Screen {
 			touchSpot.y = touchPos.y;
 			if (touchSpot.overlaps(tapItBounds)) {
 				game.zebras = new Array<Zebra>();
-				game.gameState = game.gameState.Normal;			
+				game.gameState = ZebraDropGame.State.Normal;			
 				game.setScreen(new GameScreen(game));
 				dispose();
 			}

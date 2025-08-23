@@ -26,8 +26,8 @@ public class MainMenuScreen implements Screen {
 
 	OrthographicCamera camera;
 	
-	public MainMenuScreen(final ZebraDropGame gam) {
-		game = gam;
+	public MainMenuScreen(final ZebraDropGame game) {
+		this.game = game;
 		platformInterface = game.getGameInterface();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, game.maxW, game.maxH);

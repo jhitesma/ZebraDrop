@@ -28,8 +28,8 @@ public class GameOverScreen implements Screen {
 
 	OrthographicCamera camera;
 	
-	public GameOverScreen(final ZebraDropGame gam) {
-		game = gam;
+	public GameOverScreen(final ZebraDropGame game) {
+		this.game = game;
 		platformInterface = game.getGameInterface();
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false, game.maxW, game.maxH);
@@ -154,7 +154,7 @@ public class GameOverScreen implements Screen {
 				game.bonus = 0;
 				game.buckets = 3;	
 				game.zebras = new Array<Zebra>();
-				game.gameState = game.gameState.Normal;	
+				game.gameState = ZebraDropGame.State.Normal;	
 				game.dropCount = 0;
 				game.numDropped = 0;
 				game.setScreen(new GameScreen(game));
