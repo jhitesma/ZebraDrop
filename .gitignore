@@ -13,7 +13,48 @@ zebra-drop-android/gen
 # Build directories
 build/
 */build/
+.gradle/
+*/.gradle/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+
+# Local configuration
+local.properties
+
+# Android
+*.aab
+*.ap_
+*.dex
+*/proguard/
+R.txt
+
+# iOS
+*.ipa
+xcuserdata/
+DerivedData/
+
+# GWT
+war/WEB-INF/deploy/
+war/WEB-INF/lib/
+war/WEB-INF/classes/
+*.symbolMap
+*.rpc.log
 
 # macOS
 .DS_Store
 */.DS_Store
+
+# Windows
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*~
