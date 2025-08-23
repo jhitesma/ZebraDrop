@@ -33,6 +33,12 @@ public class GameScreen implements Screen {
 	Rectangle dropper;
 	Rectangle touchSpot;
 	long lastDropTime;
+	
+	// Cached strings to avoid allocation in render loop
+	private StringBuilder fpsStringBuilder;
+	private StringBuilder levelStringBuilder;
+	private int lastFps = -1;
+	private int lastLevel = -1;
 
 	Vector3 touchPos;
 	
@@ -101,6 +107,10 @@ public class GameScreen implements Screen {
 		dropper.y = game.maxH - GameConstants.UFO_DROP_HEIGHT; 
 		dropper.width = GameConstants.BUCKET_SIZE;
 		dropper.height = GameConstants.BUCKET_SIZE;
+		
+		// Initialize string builders for performance
+		fpsStringBuilder = new StringBuilder("FPS: ");
+		levelStringBuilder = new StringBuilder("Level: ");
 	}
 
 	private void newLevel() {
@@ -214,10 +224,23 @@ public class GameScreen implements Screen {
 					game.batch.draw(zebraFrame, zebra.position.x, zebra.position.y, 32, 25, 64, 51, 1, 1, zebra.rotation);
 				}
 
-				game.font.draw(game.batch, "FPS: " + Gdx.graphics.getFramesPerSecond(), game.maxW/2 - 200, game.lineH);
+				// Use cached string builders to avoid allocation
+				int currentFps = Gdx.graphics.getFramesPerSecond();
+				if (currentFps != lastFps) {
+					fpsStringBuilder.setLength(5); // Reset to "FPS: "
+					fpsStringBuilder.append(currentFps);
+					lastFps = currentFps;
+				}
+				game.font.draw(game.batch, fpsStringBuilder.toString(), game.maxW/2 - 200, game.lineH);
 				
 				game.font.draw(game.batch, Long.toString(game.points), 20, game.lineH);
-				game.font.draw(game.batch, "Level: " + Integer.toString(game.level), game.maxW-(8*30), game.lineH);
+				
+				if (game.level != lastLevel) {
+					levelStringBuilder.setLength(7); // Reset to "Level: "
+					levelStringBuilder.append(game.level);
+					lastLevel = game.level;
+				}
+				game.font.draw(game.batch, levelStringBuilder.toString(), game.maxW-(8*30), game.lineH);
 
 				game.batch.end();
 
