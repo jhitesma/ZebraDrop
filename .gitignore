@@ -16,6 +16,10 @@ build/
 .gradle/
 */.gradle/
 
+# GWT/HTML build artifacts
+html/war/
+html/gwt-unitCache/
+
 # IDE files
 .idea/
 *.iml

@@ -11,6 +11,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -72,25 +73,26 @@ public class GameScreen extends ScreenAdapter {
 		this.game = game;
 		platformInterface = game.getGameInterface();
 
-		// load the images for the droplet and the bucket, 64x64 pixels each
-		bucketImage = game.atlas.findRegion("bucket");
-		backgroundImage = game.atlas.findRegion("background");
+		// Load images through centralized atlas (managed by AssetManager)
+		TextureAtlas atlas = game.getAtlas();
+		bucketImage = atlas.findRegion("bucket");
+		backgroundImage = atlas.findRegion("background");
 		
 		game.stateTime = 0f;  
 		Array<TextureRegion> zebraFrames = new Array<TextureRegion>();
 		for (int i = 0 ; i < 16  ; i++) {
 			if (i+1 < 10) {
-				zebraFrames.add(game.atlas.findRegion("hero0" + (i+1)));	
+				zebraFrames.add(atlas.findRegion("hero0" + (i+1)));	
 			}
 			else {
-				zebraFrames.add(game.atlas.findRegion("hero" + (i+1)));
+				zebraFrames.add(atlas.findRegion("hero" + (i+1)));
 			}
 		}
 		zebraAnimation = new Animation<TextureRegion>(ZEBRA_FRAME_DURATION, zebraFrames);
 		
 		Array<TextureRegion> ufoFrames = new Array<TextureRegion>();
 		for (int i = 0 ; i < 12  ; i++) {
-			ufoFrames.add(game.atlas.findRegion("ufo" + (i+1)));
+			ufoFrames.add(atlas.findRegion("ufo" + (i+1)));
 			Gdx.app.log("texture_load", i + " - ufo" + (i+1));
 		}
 		ufoAnimation = new Animation<TextureRegion>(UFO_FRAME_DURATION, ufoFrames);

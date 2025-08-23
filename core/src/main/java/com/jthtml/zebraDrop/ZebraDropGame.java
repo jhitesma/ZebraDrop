@@ -7,6 +7,7 @@ import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -54,6 +55,7 @@ public class ZebraDropGame extends Game {
 	SpriteBatch batch;
 	BitmapFont font;
 	State gameState;
+	AssetManager assetManager;
 	TextureAtlas atlas;
 	Sound dropSound;
 	Music rainMusic;
@@ -115,19 +117,33 @@ public class ZebraDropGame extends Game {
 		return platformInterface;	
 	}
 	
+	public AssetManager getAssetManager() {
+		return assetManager;
+	}
+	
+	public TextureAtlas getAtlas() {
+		return atlas;
+	}
+	
 	public void create() {
+		// Initialize core systems
 		batch = new SpriteBatch();
-		font = new BitmapFont(Gdx.files.internal("data/hvd_poster_32.fnt"),
-		         Gdx.files.internal("data/hvd_poster_32_0.png"), false);
-		atlas = new TextureAtlas(Gdx.files.internal("zdImages.atlas"));
+		assetManager = new AssetManager();
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Zebra.class, new ZebraAccessor());
-		gameState = State.Paused;		
+		gameState = State.Paused;
 
-		// load some sounds
-		dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
-		rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
-		rainMusic.setLooping(true);		
+		// Load all assets through AssetManager
+		loadAssets();
+		
+		// Get references to loaded assets
+		atlas = assetManager.get("zdImages.atlas", TextureAtlas.class);
+		dropSound = assetManager.get("drop.wav", Sound.class);
+		rainMusic = assetManager.get("rain.mp3", Music.class);
+		font = new BitmapFont(Gdx.files.internal("data/hvd_poster_32.fnt"),
+		         Gdx.files.internal("data/hvd_poster_32_0.png"), false);
+		
+		rainMusic.setLooping(true);
 
 		// Load high Score and high level
 		prefs = Gdx.app.getPreferences("My Preferences");
@@ -135,6 +151,18 @@ public class ZebraDropGame extends Game {
 		highLevel = prefs.getInteger("highLevel");
 		
 		this.setScreen(new MainMenuScreen(this));
+	}
+	
+	private void loadAssets() {
+		// Load texture atlas
+		assetManager.load("zdImages.atlas", TextureAtlas.class);
+		
+		// Load audio assets
+		assetManager.load("drop.wav", Sound.class);
+		assetManager.load("rain.mp3", Music.class);
+		
+		// Block until all assets are loaded
+		assetManager.finishLoading();
 	}
 	
 	public void render() {
@@ -145,8 +173,6 @@ public class ZebraDropGame extends Game {
 	public void dispose() {
 		batch.dispose();
 		font.dispose();
-		atlas.dispose();
-		dropSound.dispose();
-		rainMusic.dispose();
+		assetManager.dispose(); // This will dispose all managed assets automatically
 	}
 }
