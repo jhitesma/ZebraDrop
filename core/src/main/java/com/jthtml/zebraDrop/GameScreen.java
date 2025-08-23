@@ -39,6 +39,11 @@ public class GameScreen implements Screen {
 	private StringBuilder levelStringBuilder;
 	private int lastFps = -1;
 	private int lastLevel = -1;
+	
+	// Cached random values to avoid expensive random calls every frame
+	private float cachedDropperSpeed = 0f;
+	private long lastDirectionChange = 0;
+	private static final long DIRECTION_CHANGE_INTERVAL = 100_000_000L; // 0.1 seconds in nanoseconds
 
 	Vector3 touchPos;
 	
@@ -266,14 +271,27 @@ public class GameScreen implements Screen {
 				// the screen or that hit the bucket. In the later case we play back
 				// a sound effect as well.
 
-				if (MathUtils.random(0,10) > 7) {
-					if (game.dropDir==1) game.dropDir = 0; else game.dropDir = 1;
+				// Cached direction changes - only check every 0.1 seconds instead of every frame
+				long currentTime = TimeUtils.nanoTime();
+				if (currentTime - lastDirectionChange > DIRECTION_CHANGE_INTERVAL) {
+					if (MathUtils.random(0,10) > 7) {
+						if (game.dropDir==1) game.dropDir = 0; else game.dropDir = 1;
+						// Recalculate speed when direction changes
+						cachedDropperSpeed = MathUtils.random(GameConstants.BASE_MOVEMENT_SPEED * game.level, GameConstants.MOVEMENT_SPEED_RANGE * game.level);
+					}
+					lastDirectionChange = currentTime;
+				}
+				
+				// Use cached speed instead of calculating random speed every frame
+				if (cachedDropperSpeed == 0f) {
+					// Initialize speed on first run
+					cachedDropperSpeed = MathUtils.random(GameConstants.BASE_MOVEMENT_SPEED * game.level, GameConstants.MOVEMENT_SPEED_RANGE * game.level);
 				}
 
 				if (game.dropDir==1) {
-					dropper.x -= MathUtils.random(GameConstants.BASE_MOVEMENT_SPEED * game.level, GameConstants.MOVEMENT_SPEED_RANGE * game.level) * Gdx.graphics.getDeltaTime();
+					dropper.x -= cachedDropperSpeed * Gdx.graphics.getDeltaTime();
 				} else {
-					dropper.x += MathUtils.random(GameConstants.BASE_MOVEMENT_SPEED * game.level, GameConstants.MOVEMENT_SPEED_RANGE * game.level) * Gdx.graphics.getDeltaTime();	      
+					dropper.x += cachedDropperSpeed * Gdx.graphics.getDeltaTime();	      
 				}
 
 				// make sure the dropper stays within the screen bounds
