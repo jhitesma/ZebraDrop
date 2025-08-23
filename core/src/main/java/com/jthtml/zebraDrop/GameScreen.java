@@ -310,39 +310,50 @@ public class GameScreen implements Screen {
 						zebraPool.free(zebra);
 						dropLevel();
 					}
-					if(zebra.bounds.overlaps(game.bucketBounds)) {
-						game.dropSound.play();
-						iter.remove();
-						zebraPool.free(zebra);
-						game.dropCount++;
-						game.points = game.points + game.ptVal;
-						game.bonus = game.bonus + game.ptVal;
-
-						if (platformInterface.getSignedIn()) {
-							if (game.points >= GameConstants.SCORE_THRESHOLD_3000) {
-								platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_SCORE_3000);
-							}
-	
-							if (game.points >= GameConstants.SCORE_THRESHOLD_10000) {
-								platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_SCORE_10000);
-							}
-						}
+					
+					// Optimized collision detection: only check zebras near the entire bucket stack
+					// Skip expensive overlap check if zebra is clearly not near any bucket
+					if (zebra.position.y <= game.bucketBounds.y + game.bucketBounds.height + 10 && 
+						zebra.position.y + 64 >= game.bucket.y - 10) {  // Check against bottom bucket position
+						
+						// Quick horizontal bounding box pre-check before expensive overlaps() call
+						if (zebra.position.x + 64 >= game.bucketBounds.x && 
+							zebra.position.x <= game.bucketBounds.x + game.bucketBounds.width &&
+							zebra.bounds.overlaps(game.bucketBounds)) {
 							
-						if (game.bonus >= GameConstants.BONUS_THRESHOLD) {
-							if (game.buckets < GameConstants.MAX_BUCKETS) {
-								if (platformInterface.getSignedIn()) {
-									platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_BUCKET_BONUS);
+							game.dropSound.play();
+							iter.remove();
+							zebraPool.free(zebra);
+							game.dropCount++;
+							game.points = game.points + game.ptVal;
+							game.bonus = game.bonus + game.ptVal;
+
+							if (platformInterface.getSignedIn()) {
+								if (game.points >= GameConstants.SCORE_THRESHOLD_3000) {
+									platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_SCORE_3000);
 								}
-								game.buckets++;
-								game.bucketBounds.height = game.bucketBounds.height + GameConstants.BUCKET_STACK_HEIGHT;
-								if (game.bucketBounds.height > GameConstants.DEFAULT_BUCKET_BOUNDS_HEIGHT) {
-									game.bucketBounds.height = GameConstants.DEFAULT_BUCKET_BOUNDS_HEIGHT;
+		
+								if (game.points >= GameConstants.SCORE_THRESHOLD_10000) {
+									platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_SCORE_10000);
 								}
 							}
-							game.bonus = 0;
-						}
-						if (game.dropCount >= game.neededDrops) {
-							newLevel();
+								
+							if (game.bonus >= GameConstants.BONUS_THRESHOLD) {
+								if (game.buckets < GameConstants.MAX_BUCKETS) {
+									if (platformInterface.getSignedIn()) {
+										platformInterface.unlockAchievement(GameConstants.ACHIEVEMENT_BUCKET_BONUS);
+									}
+									game.buckets++;
+									game.bucketBounds.height = game.bucketBounds.height + GameConstants.BUCKET_STACK_HEIGHT;
+									if (game.bucketBounds.height > GameConstants.DEFAULT_BUCKET_BOUNDS_HEIGHT) {
+										game.bucketBounds.height = GameConstants.DEFAULT_BUCKET_BOUNDS_HEIGHT;
+									}
+								}
+								game.bonus = 0;
+							}
+							if (game.dropCount >= game.neededDrops) {
+								newLevel();
+							}
 						}
 					}
 				}
