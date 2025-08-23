@@ -30,7 +30,14 @@ public class Zebra {
 		this.bounds.height = HEIGHT;
 		this.bounds.width = WIDTH;
 		this.stateTime = 0f;  	
+		this.rotation = 0; // Start with no rotation
+	}
+	
+	public void reset() {
+		// Reset for pool reuse
 		this.rotation = MathUtils.random(-MAX_ROTATION, MAX_ROTATION);
+		this.stateTime = 0f;
+		this.tweenManager = null;
 	}
 	
 	public void setTweenManager(TweenManager tweenManager) {
@@ -39,8 +46,10 @@ public class Zebra {
 	
 	public void startRotation() {
 		if (tweenManager != null) {
-			Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(500, 1500))
-				.target(MathUtils.random(-MAX_ROTATION, MAX_ROTATION))
+			float duration = MathUtils.random(0.5f, 1.5f);
+			float target = MathUtils.random(-MAX_ROTATION, MAX_ROTATION);
+			Tween.to(this, ZebraAccessor.ROTATION, duration)
+				.target(target)
 				.ease(Sine.INOUT)
 				.repeatYoyo(-1, 0)
 				.setCallback(zebraCallback)
@@ -86,7 +95,7 @@ public class Zebra {
         @Override
         public void onEvent(int type, BaseTween<?> source) { 
             if (tweenManager != null) {
-                Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(500, 1500))
+                Tween.to(this, ZebraAccessor.ROTATION, MathUtils.random(0.5f, 1.5f))
                     .target(MathUtils.random(-MAX_ROTATION, MAX_ROTATION))
                     .ease(Sine.INOUT)
                     .repeatYoyo(-1, 0)

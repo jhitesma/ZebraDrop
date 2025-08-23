@@ -48,6 +48,11 @@ public class GameScreen implements Screen {
 		protected Zebra newObject() {
 			return new Zebra();
 		}
+		
+		@Override
+		protected void reset(Zebra zebra) {
+			zebra.reset();
+		}
 	};
 	
 	
