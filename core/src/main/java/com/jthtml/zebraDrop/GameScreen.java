@@ -1,6 +1,9 @@
 package com.jthtml.zebraDrop;
 
 import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenCallback;
+import aurelienribon.tweenengine.BaseTween;
+import aurelienribon.tweenengine.equations.Quart;
 
 import com.badlogic.gdx.ScreenAdapter;
 
@@ -49,6 +52,8 @@ public class GameScreen extends ScreenAdapter {
 
 	Vector3 touchPos;
 	
+	// Bucket animation tracking
+	private boolean bucketAnimating = false;
 	
 	TextureRegion zebraFrame;
 	private Animation<TextureRegion> zebraAnimation;
@@ -207,6 +212,40 @@ public class GameScreen extends ScreenAdapter {
 		}
 	}
 
+	private void animateBucketToPosition(float targetX) {
+		// Clamp target position to screen bounds first
+		if (targetX < 0) targetX = 0;
+		if (targetX > game.maxW - GameConstants.BUCKET_SIZE) targetX = (game.maxW - GameConstants.BUCKET_SIZE);
+		
+		// Calculate distance to determine if animation is needed
+		float distance = Math.abs(targetX - game.bucket.x);
+		
+		if (distance < GameConstants.BUCKET_ANIMATION_THRESHOLD) {
+			// Small movement - just move directly
+			game.bucket.x = targetX;
+			game.bucketBounds.x = game.bucket.x;
+		} else {
+			// Large movement - animate smoothly
+			if (!bucketAnimating) {
+				bucketAnimating = true;
+				Tween.to(game.bucket, BucketAccessor.POSITION_X, GameConstants.BUCKET_ANIMATION_DURATION)
+					.target(targetX)
+					.ease(Quart.OUT)
+					.setCallback(new TweenCallback() {
+						@Override
+						public void onEvent(int type, BaseTween<?> source) {
+							if (type == TweenCallback.COMPLETE) {
+								bucketAnimating = false;
+								// Ensure bounds are updated when animation completes
+								game.bucketBounds.x = game.bucket.x;
+							}
+						}
+					})
+					.start(game.tweenManager);
+			}
+		}
+	}
+
 
 	@Override
 	public void render(float delta) {
@@ -258,7 +297,8 @@ public class GameScreen extends ScreenAdapter {
 				if(Gdx.input.isTouched()) {
 					touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 					camera.unproject(touchPos);
-					game.bucket.x = touchPos.x - GameConstants.BUCKET_SIZE / 2;
+					float targetX = touchPos.x - GameConstants.BUCKET_SIZE / 2;
+					animateBucketToPosition(targetX);
 				}
 				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= (GameConstants.BUCKET_MOVEMENT_SPEED * game.level) * Gdx.graphics.getDeltaTime();
 				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += (GameConstants.BUCKET_MOVEMENT_SPEED * game.level) * Gdx.graphics.getDeltaTime();
@@ -267,6 +307,7 @@ public class GameScreen extends ScreenAdapter {
 				if(game.bucket.x < 0) game.bucket.x = 0;
 				if(game.bucket.x > game.maxW - GameConstants.BUCKET_SIZE) game.bucket.x = (game.maxW - GameConstants.BUCKET_SIZE);
 
+				// Keep bucketBounds synchronized with bucket position (important for collision detection during animation)
 				game.bucketBounds.x = game.bucket.x;
 				
 				// check if we need to create a new raindrop

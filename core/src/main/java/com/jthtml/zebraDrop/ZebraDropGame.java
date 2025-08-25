@@ -132,6 +132,7 @@ public class ZebraDropGame extends Game {
 		assetManager = new AssetManager();
 		tweenManager = new TweenManager();
 		Tween.registerAccessor(Zebra.class, new ZebraAccessor());
+		Tween.registerAccessor(Rectangle.class, new BucketAccessor());
 		gameState = State.Paused;
 
 		// Load all assets through AssetManager

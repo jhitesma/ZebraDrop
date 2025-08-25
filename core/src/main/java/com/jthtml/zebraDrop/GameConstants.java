@@ -39,6 +39,10 @@ public final class GameConstants {
     public static final int UI_BUTTON_HEIGHT = 64;
     public static final int UI_BUTTON_WIDTH = 400;
     
+    // Bucket animation
+    public static final float BUCKET_ANIMATION_DURATION = 0.15f; // Fast but smooth animation
+    public static final float BUCKET_ANIMATION_THRESHOLD = 50f;  // Min distance to trigger animation
+    
     // Game mechanics
     public static final int INITIAL_DROPS_NEEDED = 10;
     public static final int INITIAL_LEVEL = 1;
