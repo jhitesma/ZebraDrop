@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class GameOverScreen extends ScreenAdapter {
 	final ZebraDropGame game;
@@ -23,7 +23,9 @@ public class GameOverScreen extends ScreenAdapter {
 	private Stage stage;
 	private Skin skin;
 	private Table mainTable;
+	private Image backgroundImage;
 	private Image gameOverImage;
+	private Image logoImage;
 	
 	private TextButton achievementsButton;
 	private TextButton highScoreButton;
@@ -36,6 +38,9 @@ public class GameOverScreen extends ScreenAdapter {
 	private Label newRecordLabel;
 	private Label titleLabel;
 	
+	// Dynamic login label for updating text
+	private Label loginLabel;
+	
 	private Boolean newPref;
 	
 	public GameOverScreen(final ZebraDropGame game) {
@@ -43,8 +48,8 @@ public class GameOverScreen extends ScreenAdapter {
 		platformInterface = game.getGameInterface();
 		newPref = false;
 		
-		// Create stage with FitViewport for responsive scaling
-		stage = new Stage(new FitViewport(game.maxW, game.maxH));
+		// Create stage with ExtendViewport to fill screen without letterboxing
+		stage = new Stage(new ExtendViewport(game.maxW, game.maxH));
 		Gdx.input.setInputProcessor(stage);
 		
 		// Game over logic (preserve original behavior)
@@ -118,6 +123,11 @@ public class GameOverScreen extends ScreenAdapter {
 	}
 	
 	private void createUI() {
+		// Create blurred background
+		backgroundImage = new Image(game.atlas.findRegion("blurred_bg"));
+		backgroundImage.setFillParent(true);
+		stage.addActor(backgroundImage);
+		
 		// Create main table for layout
 		mainTable = new Table();
 		mainTable.setFillParent(true);
@@ -125,6 +135,9 @@ public class GameOverScreen extends ScreenAdapter {
 		
 		// Create game over image as a separate display element
 		gameOverImage = new Image(game.atlas.findRegion("gameover"));
+		
+		// Create logo image
+		logoImage = new Image(game.atlas.findRegion("logo"));
 		
 		// No separate restart button - the game over image itself is clickable
 		
@@ -177,18 +190,44 @@ public class GameOverScreen extends ScreenAdapter {
 	}
 	
 	private Table createMenuButtonTable(TextButton button, String text) {
-		// Create table with icon on left, text on right (like original)
+		// Create table with consistent alignment for all menu items
 		Table table = new Table();
 		
-		// Add controller icon on left
+		// Add controller icon with fixed positioning
 		Image icon = new Image(game.atlas.findRegion("ic_play_games_badge_green"));
-		table.add(icon).width(64).height(64).padRight(10);
+		table.add(icon).width(64).height(64).padRight(10).left();
 		
-		// Add text label on right
+		// Add text label with consistent left alignment
 		Label textLabel = new Label(text, skin);
-		table.add(textLabel).left();
+		table.add(textLabel).left().expandX();
 		
-		// Make the whole table clickable by copying the button's click listener
+		// Ensure the table itself is left-aligned
+		table.left();
+		
+		// Make the whole table clickable
+		if (button.getListeners().size > 0) {
+			table.addListener(button.getListeners().first());
+		}
+		
+		return table;
+	}
+	
+	private Table createLoginButtonTable(TextButton button) {
+		// Create table with consistent alignment matching other menu items
+		Table table = new Table();
+		
+		// Add controller icon with fixed positioning
+		Image icon = new Image(game.atlas.findRegion("ic_play_games_badge_green"));
+		table.add(icon).width(64).height(64).padRight(10).left();
+		
+		// Add text label with consistent left alignment
+		loginLabel = new Label("Login", skin);
+		table.add(loginLabel).left().expandX();
+		
+		// Ensure the table itself is left-aligned
+		table.left();
+		
+		// Make the whole table clickable
 		if (button.getListeners().size > 0) {
 			table.addListener(button.getListeners().first());
 		}
@@ -203,25 +242,34 @@ public class GameOverScreen extends ScreenAdapter {
 		Table leftSide = new Table();
 		Table centerArea = new Table();
 		
-		// Menu buttons on left side - create icon+text layout like original
+		// Menu buttons on left side - ensure perfect left alignment
 		Table achievementsTable = createMenuButtonTable(achievementsButton, "Achievements");
 		Table highScoreTable = createMenuButtonTable(highScoreButton, "High Scores");
 		Table highLevelTable = createMenuButtonTable(highLevelButton, "High Levels");
-		Table loginTable = createMenuButtonTable(loginButton, "");
+		Table loginTable = createLoginButtonTable(loginButton);
 		
-		leftSide.add(achievementsTable).width(400).height(64).padTop(150).row();
-		leftSide.add(highScoreTable).width(400).height(64).padTop(10).row();
-		leftSide.add(highLevelTable).width(400).height(64).padTop(10).row();
-		leftSide.add(loginTable).width(200).height(64).padTop(10);
-		leftSide.top().left();
+		// All menu buttons with identical layout - perfect left alignment
+		leftSide.add(achievementsTable).width(400).height(64).left().padTop(80).row();
+		leftSide.add(highScoreTable).width(400).height(64).left().padTop(15).row();
+		leftSide.add(highLevelTable).width(400).height(64).left().padTop(15).row();
+		leftSide.add(loginTable).width(400).height(64).left().padTop(15);
+		leftSide.top().left().padLeft(50);
 		
-		// Center area with game over image and title
-		centerArea.add(titleLabel).pad(10).row();
-		centerArea.add(gameOverImage).pad(10).row();
+		// Game over button centered horizontally, positioned to align with top of menu
+		Table gameOverTable = new Table();
+		gameOverTable.add(gameOverImage).center().padTop(80); // Match menu's padTop
+		gameOverTable.top().setFillParent(true);
+		
 		// Make the game over image clickable for restart (like original)
-		gameOverImage.addListener(new ChangeListener() {
+		// Use InputListener for better touch/click handling on images
+		gameOverImage.addListener(new com.badlogic.gdx.scenes.scene2d.InputListener() {
 			@Override
-			public void changed(ChangeEvent event, Actor actor) {
+			public boolean touchDown(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y, int pointer, int button) {
+				return true; // Consume the event
+			}
+			
+			@Override
+			public void touchUp(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y, int pointer, int button) {
 				// Reset game state (same as playButton)
 				game.bucketBounds.height = GameConstants.BUCKET_HEIGHT;
 				game.dropRate = game.minDropRate;
@@ -242,10 +290,15 @@ public class GameOverScreen extends ScreenAdapter {
 			}
 		});
 		
+		stage.addActor(gameOverTable);
+		
+		// New records label positioned below game over button when there are new records
 		if (newPref) {
-			centerArea.add(newRecordLabel).pad(10).row();
+			Table recordsTable = new Table();
+			recordsTable.add(newRecordLabel).center().padTop(80 + gameOverImage.getHeight() + 20);
+			recordsTable.top().setFillParent(true);
+			stage.addActor(recordsTable);
 		}
-		centerArea.center();
 		
 		// Bottom score info like original
 		Table bottomTable = new Table();
@@ -253,21 +306,29 @@ public class GameOverScreen extends ScreenAdapter {
 		bottomTable.add(highScoreLabel).center().expandX();
 		bottomTable.add(levelLabel).right().padRight(20);
 		
-		// Main table layout
+		// Main table layout - now just the left menu (game over button positioned independently)
 		Table contentTable = new Table();
-		contentTable.add(leftSide).width(450).fillY().top();
-		contentTable.add(centerArea).expand().center();
+		contentTable.add(leftSide).width(450).fillY().top().padLeft(20);
+		contentTable.top().left().setFillParent(true);
+		stage.addActor(contentTable);
 		
-		// Final layout
-		mainTable.add(contentTable).expand().fill().row();
-		mainTable.add(bottomTable).fillX().bottom().padBottom(20);
+		// Logo positioned independently in top-right corner with fixed 10px margins
+		// Use stage dimensions (actual screen area) instead of game virtual dimensions
+		float logoX = stage.getWidth() - logoImage.getWidth() - 10; // Right edge 10px from screen edge
+		float logoY = stage.getHeight() - logoImage.getHeight() - 10; // Top edge 10px from screen edge
+		logoImage.setPosition(logoX, logoY);
+		stage.addActor(logoImage);
+		
+		// Bottom score info positioned independently
+		bottomTable.bottom().setFillParent(true);
+		bottomTable.padBottom(20);
+		stage.addActor(bottomTable);
 	}
 	
 	
 	@Override
 	public void render(float delta) {		
-		// GAME OVER - lighter background for better text readability
-		Gdx.gl.glClearColor(0.3f, 0.3f, 0.5f, 1);
+		Gdx.gl.glClearColor(0, 0, 0.2f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		// Update labels with current game state
@@ -275,11 +336,11 @@ public class GameOverScreen extends ScreenAdapter {
 		highScoreLabel.setText("HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel));
 		levelLabel.setText("Level: " + Integer.toString(game.level));
 		
-		// Update login button text
+		// Update login label text
 		if (platformInterface.getSignedIn()) {
-			loginButton.setText("Logout");
+			loginLabel.setText("Logout");
 		} else {
-			loginButton.setText("Login");
+			loginLabel.setText("Login");
 		}
 		
 		// Update and render stage
