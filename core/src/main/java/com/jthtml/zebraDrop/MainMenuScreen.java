@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class MainMenuScreen extends ScreenAdapter {
 	final ZebraDropGame game;
@@ -36,12 +36,15 @@ public class MainMenuScreen extends ScreenAdapter {
 	private Label highScoreLabel;
 	private Label levelLabel;
 	
+	// Dynamic login label for updating text
+	private Label loginLabel;
+	
 	public MainMenuScreen(final ZebraDropGame game) {
 		this.game = game;
 		platformInterface = game.getGameInterface();
 		
-		// Create stage with FitViewport for responsive scaling
-		stage = new Stage(new FitViewport(game.maxW, game.maxH));
+		// Create stage with ExtendViewport to fill screen without letterboxing
+		stage = new Stage(new ExtendViewport(game.maxW, game.maxH));
 		Gdx.input.setInputProcessor(stage);
 		
 		// Create simple skin for buttons
@@ -73,10 +76,8 @@ public class MainMenuScreen extends ScreenAdapter {
 		backgroundImage.setFillParent(true);
 		stage.addActor(backgroundImage);
 		
-		// Create main table for layout
+		// Create main table for layout (will be used by individual components)
 		mainTable = new Table();
-		mainTable.setFillParent(true);
-		stage.addActor(mainTable);
 		
 		// Create logo
 		logoImage = new Image(game.atlas.findRegion("logo"));
@@ -138,18 +139,44 @@ public class MainMenuScreen extends ScreenAdapter {
 	}
 	
 	private Table createMenuButtonTable(TextButton button, String text) {
-		// Create table with icon on left, text on right (like original)
+		// Create table with consistent alignment for all menu items
 		Table table = new Table();
 		
-		// Add controller icon on left
+		// Add controller icon with fixed positioning
 		Image icon = new Image(game.atlas.findRegion("ic_play_games_badge_green"));
-		table.add(icon).width(64).height(64).padRight(10);
+		table.add(icon).width(64).height(64).padRight(10).left();
 		
-		// Add text label on right
+		// Add text label with consistent left alignment
 		Label textLabel = new Label(text, skin);
-		table.add(textLabel).left();
+		table.add(textLabel).left().expandX();
 		
-		// Make the whole table clickable by copying the button's click listener
+		// Ensure the table itself is left-aligned
+		table.left();
+		
+		// Make the whole table clickable
+		if (button.getListeners().size > 0) {
+			table.addListener(button.getListeners().first());
+		}
+		
+		return table;
+	}
+	
+	private Table createLoginButtonTable(TextButton button) {
+		// Create table with consistent alignment matching other menu items
+		Table table = new Table();
+		
+		// Add controller icon with fixed positioning
+		Image icon = new Image(game.atlas.findRegion("ic_play_games_badge_green"));
+		table.add(icon).width(64).height(64).padRight(10).left();
+		
+		// Add text label with consistent left alignment
+		loginLabel = new Label("Login", skin);
+		table.add(loginLabel).left().expandX();
+		
+		// Ensure the table itself is left-aligned
+		table.left();
+		
+		// Make the whole table clickable
 		if (button.getListeners().size > 0) {
 			table.addListener(button.getListeners().first());
 		}
@@ -158,43 +185,52 @@ public class MainMenuScreen extends ScreenAdapter {
 	}
 
 	private void layoutUI() {
-		// Main layout structure to match original positioning
+		// Revert to table-based layout but fix alignment issues
 		
 		// Create split layout: left side for menu, right side for logo/play button
 		Table leftSide = new Table();
 		Table rightSide = new Table();
 		
-		// Menu buttons on left side - create icon+text layout like original
+		// Menu buttons on left side - ensure perfect left alignment
 		Table achievementsTable = createMenuButtonTable(achievementsButton, "Achievements");
 		Table highScoreTable = createMenuButtonTable(highScoreButton, "High Scores");
 		Table highLevelTable = createMenuButtonTable(highLevelButton, "High Levels");
-		Table loginTable = createMenuButtonTable(loginButton, "");
+		Table loginTable = createLoginButtonTable(loginButton);
 		
-		leftSide.add(achievementsTable).width(400).height(64).padTop(150).row();
-		leftSide.add(highScoreTable).width(400).height(64).padTop(10).row();
-		leftSide.add(highLevelTable).width(400).height(64).padTop(10).row();
-		leftSide.add(loginTable).width(200).height(64).padTop(10);
-		leftSide.top().left();
+		// All menu buttons with identical layout - perfect left alignment
+		leftSide.add(achievementsTable).width(400).height(64).left().padTop(80).row();
+		leftSide.add(highScoreTable).width(400).height(64).left().padTop(15).row();
+		leftSide.add(highLevelTable).width(400).height(64).left().padTop(15).row();
+		leftSide.add(loginTable).width(400).height(64).left().padTop(15);
+		leftSide.top().left().padLeft(50);
 		
-		// Logo and play button on right side
-		rightSide.add(logoImage).padTop(20).padRight(20).row();
-		rightSide.add(playButton).size(387, 485).center().expand();
-		rightSide.top().right();
+		// Logo positioned with fixed 10px margins from top and right edges
+		// Use stage dimensions (actual screen area) instead of game virtual dimensions
+		float logoX = stage.getWidth() - logoImage.getWidth() - 10; // Right edge 10px from screen edge
+		float logoY = stage.getHeight() - logoImage.getHeight() - 10; // Top edge 10px from screen edge
+		logoImage.setPosition(logoX, logoY);
+		stage.addActor(logoImage);
 		
-		// Bottom score info like original
+		// Play button centered in entire screen (independent of layout columns)
+		Table playTable = new Table();
+		playTable.add(playButton).center();
+		playTable.setFillParent(true);
+		stage.addActor(playTable);
+		
+		// Bottom score info
 		Table bottomTable = new Table();
 		bottomTable.add(scoreLabel).left().padLeft(20);
 		bottomTable.add(highScoreLabel).center().expandX();
 		bottomTable.add(levelLabel).right().padRight(20);
+		bottomTable.bottom().setFillParent(true);
+		bottomTable.padBottom(20);
+		stage.addActor(bottomTable);
 		
-		// Main table layout
+		// Main table layout - now just the left menu
 		Table contentTable = new Table();
-		contentTable.add(leftSide).width(450).fillY().top();
-		contentTable.add(rightSide).expand().fillY().top();
-		
-		// Final layout
-		mainTable.add(contentTable).expand().fill().row();
-		mainTable.add(bottomTable).fillX().bottom().padBottom(20);
+		contentTable.add(leftSide).width(450).fillY().top().padLeft(20);
+		contentTable.top().left().setFillParent(true);
+		stage.addActor(contentTable);
 	}
 	
 	
@@ -206,13 +242,13 @@ public class MainMenuScreen extends ScreenAdapter {
 		// Update labels with current game state
 		scoreLabel.setText(Long.toString(game.points));
 		highScoreLabel.setText("HS: " + Long.toString(game.highScore) + " HL: " + Long.toString(game.highLevel));
-		levelLabel.setText("Level: " + Integer.toString(game.level));
+		levelLabel.setText("Level: " + game.level);
 		
-		// Update login button text
+		// Update login label text
 		if (platformInterface.getSignedIn()) {
-			loginButton.setText("Logout");
+			loginLabel.setText("Logout");
 		} else {
-			loginButton.setText("Login");
+			loginLabel.setText("Login");
 		}
 		
 		// Update and render stage
