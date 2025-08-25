@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 public class PauseScreen extends ScreenAdapter {
 	final ZebraDropGame game;
@@ -31,8 +31,8 @@ public class PauseScreen extends ScreenAdapter {
 	public PauseScreen(final ZebraDropGame game) {
 		this.game = game;
 		
-		// Create stage with FitViewport for responsive scaling
-		stage = new Stage(new FitViewport(game.maxW, game.maxH));
+		// Create stage with ExtendViewport to fill screen without letterboxing
+		stage = new Stage(new ExtendViewport(game.maxW, game.maxH));
 		Gdx.input.setInputProcessor(stage);
 		
 		// Create skin
