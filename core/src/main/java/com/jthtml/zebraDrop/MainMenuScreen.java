@@ -32,6 +32,10 @@ public class MainMenuScreen extends ScreenAdapter {
 	private TextButton highLevelButton;
 	private TextButton loginButton;
 	
+	// Temporary debug buttons
+	private TextButton pauseScreenButton;
+	private TextButton gameOverScreenButton;
+	
 	private Label scoreLabel;
 	private Label highScoreLabel;
 	private Label levelLabel;
@@ -129,6 +133,26 @@ public class MainMenuScreen extends ScreenAdapter {
 			}
 		});
 		
+		// Temporary debug buttons for testing other screens
+		pauseScreenButton = new TextButton("TEST PAUSE", skin, "menu");
+		pauseScreenButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.setScreen(new PauseScreen(game));
+				dispose();
+			}
+		});
+
+
+		gameOverScreenButton = new TextButton("TEST GAME OVER", skin, "menu");
+		gameOverScreenButton.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.setScreen(new GameOverScreen(game));
+				dispose();
+			}
+		});
+		
 		// Create labels for score display
 		scoreLabel = new Label("", skin);
 		highScoreLabel = new Label("", skin);
@@ -149,6 +173,25 @@ public class MainMenuScreen extends ScreenAdapter {
 		// Add text label with consistent left alignment
 		Label textLabel = new Label(text, skin);
 		table.add(textLabel).left().expandX();
+		
+		// Ensure the table itself is left-aligned
+		table.left();
+		
+		// Make the whole table clickable
+		if (button.getListeners().size > 0) {
+			table.addListener(button.getListeners().first());
+		}
+		
+		return table;
+	}
+	
+	private Table createDebugButtonTable(TextButton button, String text) {
+		// Create table for debug buttons - simple text only, no icon
+		Table table = new Table();
+		
+		// Add text label with left padding to align with other menu items
+		Label textLabel = new Label(text, skin);
+		table.add(textLabel).left().padLeft(74); // 64px icon width + 10px padding
 		
 		// Ensure the table itself is left-aligned
 		table.left();
@@ -197,11 +240,19 @@ public class MainMenuScreen extends ScreenAdapter {
 		Table highLevelTable = createMenuButtonTable(highLevelButton, "High Levels");
 		Table loginTable = createLoginButtonTable(loginButton);
 		
+		// Temporary debug buttons - visually distinct from normal menu buttons
+		Table pauseTable = createDebugButtonTable(pauseScreenButton, "TEST PAUSE");
+		Table gameOverTable = createDebugButtonTable(gameOverScreenButton, "TEST GAME OVER");
+		
 		// All menu buttons with identical layout - perfect left alignment
 		leftSide.add(achievementsTable).width(400).height(64).left().padTop(80).row();
 		leftSide.add(highScoreTable).width(400).height(64).left().padTop(15).row();
 		leftSide.add(highLevelTable).width(400).height(64).left().padTop(15).row();
-		leftSide.add(loginTable).width(400).height(64).left().padTop(15);
+		leftSide.add(loginTable).width(400).height(64).left().padTop(15).row();
+		
+		// Add debug buttons with visual separation
+		leftSide.add(pauseTable).width(400).height(64).left().padTop(30).row();
+		leftSide.add(gameOverTable).width(400).height(64).left().padTop(15);
 		leftSide.top().left().padLeft(50);
 		
 		// Logo positioned with fixed 10px margins from top and right edges
