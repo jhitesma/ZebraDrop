@@ -43,6 +43,7 @@ R.txt
 *.ipa
 xcuserdata/
 DerivedData/
+ios/robovm-build/
 
 # GWT
 war/WEB-INF/deploy/
