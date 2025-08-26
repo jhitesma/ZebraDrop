@@ -1,0 +1,86 @@
+ZebraDrop Code Improvements TODO
+=================================
+
+CRITICAL ISSUES (Priority 1):
+[x] Fix hardcoded achievement IDs in GameScreen.java:275,279,285
+    - Created GameConstants.java with named constants
+[x] Fix memory leak in MainMenuScreen.java:100,104,108
+    - Removed premature dispose() calls after platform interface calls
+[x] Fix zebra rotation tween system in Zebra.java
+    - Fixed duration units (was using milliseconds instead of seconds)
+    - Implemented proper
+[ ] Fix FPS issues that started after modernization updates.  GameScreen was seeing 120+ fps before the modernization updates, now it only gets 60fpx max on android making the game hard to play˚
+
+CODE QUALITY ISSUES (Priority 2):
+[x] Fix inconsistent state enum usage in GameScreen.java:102,175˚
+    - Fixed: Now using ZebraDropGame.State.Paused consistently
+[x] Replace magic numbers with constants
+    - Fixed: Added comprehensive constants in GameConstants.java
+    - Movement speeds, bucket heights, UI dimensions all parameterized
+[x] Improve variable naming
+    - Fixed: Changed 'gam' -> 'game' in all constructors
+[x] Add input validation and bounds checking
+    - Fixed: The existing code already has proper bounds checking for buckets and screen edges
+
+PERFORMANCE ISSUES (Priority 3):
+[x] Optimize collision detection
+    - Replace linear search through zebras with spatial partitioning
+[x] Fix string concatenation in render loop (GameScreen.java:212-213)
+    - Cache strings or use StringBuilder
+[x] Reduce unnecessary random calls (GameScreen.java:239)
+
+MODERNIZATION (Priority 4):
+[x] Update to ScreenAdapter instead of Screen interface
+    - All 4 screens now extend ScreenAdapter instead of implementing Screen
+    - Removed 25+ lines of empty boilerplate methods
+[x] Replace deprecated Animation constructor with builder pattern
+    - Updated zebra and UFO animations to use Array<TextureRegion> instead of TextureRegion[]
+    - Eliminated deprecation warnings, uses modern LibGDX API
+[x] Implement AssetManager for resource loading
+    - Added centralized AssetManager to ZebraDropGame
+    - All assets (atlas, sounds, music) now loaded through AssetManager
+    - Improved memory management and error handling
+    - Added helper methods getAssetManager() and getAtlas()
+[x] Consider scene2d.ui for UI elements instead of manual positioning
+    - All 4 screens successfully converted to scene2d.ui with responsive Table layouts
+    - Font compatibility issues resolved, controller icons positioned properly
+[x] Update to modern LibGDX patterns and best practices
+    - Complete modernization achieved: ScreenAdapter, AssetManager, Animation patterns
+
+UI FIXES (Priority 5):
+[x] Fix GameOverScreen text color - investigate why font.setColor() isn't working
+    - Text appears black on lighter background, should be white/visible
+    - COMPLETED: GameOverScreen now matches MainMenuScreen with restored functionality
+
+GAMEPLAY UPDATES (Priority 6):
+[x] Fix bucket positioning on big jumps
+    - Implemented smooth horizontal animation using Tween engine with BucketAccessor
+    - Buckets now animate to new position instead of jumping instantly
+    - Animation threshold prevents excessive animations for small movements
+    - Uses Quart.OUT easing for natural movement feel
+
+GOOGLE PLAY SERVICES MIGRATION (Priority 7):
+[ ] Migrate Android implementation from deprecated Google Play Games v1 to v2 SDK
+    - Update to PlayGames.getLeaderboardsClient() and PlayGames.getAchievementsClient()
+    - Replace manual Google Sign-In with automatic authentication
+    - Initialize with PlayGamesSdk.initialize() in Application.onCreate()
+    - DEADLINE: Must complete before May 2026, new submissions blocked after Feb 2025
+[ ] Research and implement cross-platform leaderboard/achievement solution
+    - Evaluate services like GameCenter (iOS) + Google Play Games (Android) with unified backend
+    - Consider Firebase Leaderboards, Unity Gaming Services, or custom API solution
+    - Priority: Find solution that supports shared leaderboards across iOS/Android platforms
+    - Implementation: Update LibGDX interface to support new cross-platform service
+
+MODERNIZATION POLISH (Priority 8):
+[ ] Replace wrapper types with primitives in ZebraDropGame.java:65
+    - Change Boolean signedIn to boolean signedIn
+[ ] Optimize string concatenation in render loops
+    - Replace Long.toString() with direct concatenation across screen classes
+[ ] Encapsulate game state in ZebraDropGame.java
+    - Make 20+ public fields private with proper getters/setters
+[ ] Extract UI helper class to reduce code duplication
+    - Common button creation and layout methods across screen classes
+[ ] Break down large GameScreen.render() method
+    - Extract input handling, entity updating, and collision detection into separate methods
+[ ] Replace remaining magic numbers with GameConstants
+    - Add BUCKET_SIZE constant for hardcoded 64 values in collision detection

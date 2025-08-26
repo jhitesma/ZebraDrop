@@ -1,0 +1,20 @@
+I'm resuming work on the ZebraDrop LibGDX game modernization project. Please read the HANDOFF_SUMMARY.md file and the todo.txt file (if it exists) to understand the current state of the project and what has been completed.
+
+This is a 12-year-old LibGDX game that we've been modernizing. In the most recent session, we completed a major UI modernization effort, converting all screens from manual positioning to scene2d.ui framework and resolving font compatibility issues.
+
+Key things to check when you review the files:
+1. What major work has been completed (should include scene2d.ui conversion, performance optimizations, etc.)
+2. What tasks remain incomplete or need refinement
+3. Current status of the modernization effort
+4. Any known issues that need addressing
+
+After reviewing, please give me a brief summary of where we left off and what the next logical steps would be for continuing the modernization work.
+
+The main project files are in core/src/main/java/com/jthtml/zebraDrop/ and the key screens are:
+- MainMenuScreen.java
+- GameScreen.java  
+- PauseScreen.java
+- GameOverScreen.java
+- ZebraDropGame.java (main game class)
+
+Please start by reading the summary and todo files, then let me know what you found.
