@@ -221,28 +221,35 @@ public class GameScreen extends ScreenAdapter {
 		float distance = Math.abs(targetX - game.bucket.x);
 		
 		if (distance < GameConstants.BUCKET_ANIMATION_THRESHOLD) {
-			// Small movement - just move directly
+			// Small movement - just move directly for instant response
 			game.bucket.x = targetX;
 			game.bucketBounds.x = game.bucket.x;
-		} else {
-			// Large movement - animate smoothly
-			if (!bucketAnimating) {
-				bucketAnimating = true;
-				Tween.to(game.bucket, BucketAccessor.POSITION_X, GameConstants.BUCKET_ANIMATION_DURATION)
-					.target(targetX)
-					.ease(Quart.OUT)
-					.setCallback(new TweenCallback() {
-						@Override
-						public void onEvent(int type, BaseTween<?> source) {
-							if (type == TweenCallback.COMPLETE) {
-								bucketAnimating = false;
-								// Ensure bounds are updated when animation completes
-								game.bucketBounds.x = game.bucket.x;
-							}
-						}
-					})
-					.start(game.tweenManager);
+			// Cancel any existing animation for immediate response
+			if (bucketAnimating) {
+				game.tweenManager.killAll();
+				bucketAnimating = false;
 			}
+		} else {
+			// Large movement - animate smoothly but allow override
+			if (bucketAnimating) {
+				// Override existing animation with new target for better responsiveness
+				game.tweenManager.killAll();
+			}
+			bucketAnimating = true;
+			Tween.to(game.bucket, BucketAccessor.POSITION_X, GameConstants.BUCKET_ANIMATION_DURATION)
+				.target(targetX)
+				.ease(Quart.OUT)
+				.setCallback(new TweenCallback() {
+					@Override
+					public void onEvent(int type, BaseTween<?> source) {
+						if (type == TweenCallback.COMPLETE) {
+							bucketAnimating = false;
+							// Ensure bounds are updated when animation completes
+							game.bucketBounds.x = game.bucket.x;
+						}
+					}
+				})
+				.start(game.tweenManager);
 		}
 	}
 
@@ -300,8 +307,9 @@ public class GameScreen extends ScreenAdapter {
 					float targetX = touchPos.x - GameConstants.BUCKET_SIZE / 2;
 					animateBucketToPosition(targetX);
 				}
-				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= (GameConstants.BUCKET_MOVEMENT_SPEED * game.level) * Gdx.graphics.getDeltaTime();
-				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += (GameConstants.BUCKET_MOVEMENT_SPEED * game.level) * Gdx.graphics.getDeltaTime();
+				// Consistent fast keyboard movement regardless of level for 60 FPS gameplay
+				if(Gdx.input.isKeyPressed(Keys.LEFT)) game.bucket.x -= GameConstants.BUCKET_MOVEMENT_SPEED * Gdx.graphics.getDeltaTime();
+				if(Gdx.input.isKeyPressed(Keys.RIGHT)) game.bucket.x += GameConstants.BUCKET_MOVEMENT_SPEED * Gdx.graphics.getDeltaTime();
 
 				// make sure the bucket stays within the screen bounds
 				if(game.bucket.x < 0) game.bucket.x = 0;

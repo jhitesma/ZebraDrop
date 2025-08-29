@@ -20,10 +20,10 @@ public final class GameConstants {
     public static final int SCORE_THRESHOLD_10000 = 10000;
     public static final int BONUS_THRESHOLD = 1000;
     
-    // Movement speeds
+    // Movement speeds - optimized for 60 FPS gameplay
     public static final int BASE_MOVEMENT_SPEED = 200;
     public static final int MOVEMENT_SPEED_RANGE = 250;
-    public static final int BUCKET_MOVEMENT_SPEED = 260;
+    public static final int BUCKET_MOVEMENT_SPEED = 520; // Doubled for faster response
     
     // Bucket heights and dimensions
     public static final int BUCKET_HEIGHT = 212;
@@ -39,9 +39,9 @@ public final class GameConstants {
     public static final int UI_BUTTON_HEIGHT = 64;
     public static final int UI_BUTTON_WIDTH = 400;
     
-    // Bucket animation
-    public static final float BUCKET_ANIMATION_DURATION = 0.15f; // Fast but smooth animation
-    public static final float BUCKET_ANIMATION_THRESHOLD = 50f;  // Min distance to trigger animation
+    // Bucket animation - optimized for 60 FPS responsiveness
+    public static final float BUCKET_ANIMATION_DURATION = 0.06f; // Much faster animation for better response
+    public static final float BUCKET_ANIMATION_THRESHOLD = 100f;  // Higher threshold - only animate very large jumps
     
     // Game mechanics
     public static final int INITIAL_DROPS_NEEDED = 10;
